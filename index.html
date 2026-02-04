@@ -3,39 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCTV Bekasi Kota - Aktif Saja</title>
+    <title>KangCCTV - CCTV Bekasi Aktif</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #111; color: #eee; margin: 0; padding: 20px; }
-        h1 { text-align: center; color: #4fc3f7; margin-bottom: 10px; }
-        .info { text-align: center; color: #aaa; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .thumbnail { cursor: pointer; border: 1px solid #444; border-radius: 10px; overflow: hidden; background: #222; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
-        .thumbnail:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(79,195,247,0.5); }
-        .thumbnail img { width: 100%; height: 140px; object-fit: cover; background: #000 url('https://placehold.co/220x140/222/eee?text=Loading...') center/cover no-repeat; }
-        .thumbnail p { margin: 10px; text-align: center; font-weight: bold; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .loading { text-align: center; font-size: 1.2em; margin: 30px; color: #888; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #0d1117; 
+            color: #c9d1d9; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #58a6ff; 
+            margin-bottom: 10px; 
+        }
+        .note { 
+            text-align: center; 
+            color: #8b949e; 
+            font-size: 0.9em; 
+            margin: 10px 0 20px; 
+        }
+        .controls { 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        button { 
+            background: #238636; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 1em; 
+        }
+        button:hover { background: #2ea043; }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+        .thumbnail { 
+            cursor: pointer; 
+            border: 1px solid #30363d; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            background: #161b22; 
+            transition: all 0.2s; 
+        }
+        .thumbnail:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(88,166,255,0.2); 
+        }
+        .thumbnail img { 
+            width: 100%; 
+            height: 140px; 
+            object-fit: cover; 
+            background: #000 url('https://placehold.co/220x140/161b22/c9d1d9?text=Loading...') center/cover; 
+        }
+        .thumbnail p { 
+            margin: 10px; 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 0.95em; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        .loading { 
+            text-align: center; 
+            font-size: 1.2em; 
+            margin: 30px; 
+            color: #8b949e; 
+        }
+        .info { 
+            text-align: center; 
+            color: #8b949e; 
+            margin: 20px 0; 
+        }
+        /* Modal */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.9); 
+        }
+        .modal-content { 
+            background: #0d1117; 
+            margin: 5% auto; 
+            padding: 20px; 
+            border: 1px solid #30363d; 
+            width: 85%; 
+            max-width: 900px; 
+            border-radius: 10px; 
+        }
+        .close { 
+            color: #8b949e; 
+            float: right; 
+            font-size: 36px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+        .close:hover { color: #c9d1d9; }
+        video { width: 100%; background: #000; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
-    <h1>CCTV Kota Bekasi - Hanya yang Aktif</h1>
-    <div class="loading" id="loading">Sedang memeriksa CCTV yang aktif... (bisa butuh 1-2 menit)</div>
+    <h1>KangCCTV - CCTV Kota Bekasi (Hanya yang Aktif)</h1>
+    <p class="note">
+        Catatan: Streaming paling lancar di <strong>Google Chrome</strong> atau <strong>Microsoft Edge</strong>. 
+        Browser lain (seperti Zed/Firefox) mungkin mengalami kendala karena kompatibilitas HLS.
+    </p>
+
+    <div class="controls">
+        <button onclick="refreshCCTV()">Refresh Daftar CCTV</button>
+    </div>
+
+    <div class="loading" id="loading">Sedang memeriksa CCTV yang aktif...</div>
     <div class="info" id="info"></div>
     <div class="grid" id="cctv-grid"></div>
 
     <!-- Modal -->
-    <div id="modal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.9);">
-        <div class="modal-content" style="background:#111; margin:5% auto; padding:20px; border:1px solid #333; width:85%; max-width:900px; border-radius:10px;">
-            <span class="close" onclick="closeModal()" style="color:#aaa; float:right; font-size:36px; font-weight:bold; cursor:pointer;">&times;</span>
-            <h2 id="modal-title" style="color:#4fc3f7; margin-top:0;"></h2>
-            <video id="video-player" controls autoplay style="width:100%; background:#000;"></video>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title" style="color:#58a6ff; margin-top:0;"></h2>
+            <video id="video-player" controls autoplay style="width:100%;"></video>
         </div>
     </div>
 
     <script>
         const BASE_URL = 'https://eofficev2.bekasikota.go.id/backupcctv/m3/';
 
-        // List CCTV (nama clean tanpa nomor depan, biar rapi)
         const cctvList = [
             { value: "Depan_Anugrah_Motor.m3u8", name: "Depan Anugrah Motor" },
             { value: "Depan_FTL_Fitness.m3u8", name: "Depan FTL Fitness" },
@@ -95,14 +200,14 @@
         const videoPlayer = document.getElementById('video-player');
 
         let activeCount = 0;
-        let checked = 0;
+        let checkedCount = 0;
 
         function checkStreamActive(url, callback) {
             const testVideo = document.createElement('video');
             testVideo.muted = true;
             testVideo.preload = 'auto';
             testVideo.src = url;
-            const timeout = setTimeout(() => { callback(false); testVideo.remove(); }, 8000);
+            const timeout = setTimeout(() => { callback(false); testVideo.remove(); }, 12000);
 
             testVideo.onloadeddata = () => { clearTimeout(timeout); callback(true); testVideo.remove(); };
             testVideo.onerror = () => { clearTimeout(timeout); callback(false); testVideo.remove(); };
@@ -114,8 +219,8 @@
             const div = document.createElement('div');
             div.className = 'thumbnail';
             div.innerHTML = `
-                <img src="https://placehold.co/220x140/333/eee?text=${encodeURIComponent(cctv.name.substring(0,20))}" 
-                     onerror="this.src='https://placehold.co/220x140/222/eee?text=Offline';"
+                <img src="https://placehold.co/220x140/161b22/c9d1d9?text=${encodeURIComponent(cctv.name.substring(0,20))}" 
+                     onerror="this.src='https://placehold.co/220x140/161b22/8b949e?text=Offline';" 
                      alt="${cctv.name}">
                 <p>${cctv.name}</p>
             `;
@@ -123,17 +228,26 @@
             grid.appendChild(div);
         }
 
-        cctvList.forEach(cctv => {
-            const fullUrl = BASE_URL + cctv.value;
-            checkStreamActive(fullUrl, isActive => {
-                if (isActive) addThumbnail(cctv, fullUrl);
-                checked++;
-                if (checked === cctvList.length) {
-                    loading.style.display = 'none';
-                    info.textContent = `Menampilkan ${activeCount} CCTV aktif dari ${cctvList.length}`;
-                }
+        function loadCCTV() {
+            grid.innerHTML = ''; // clear grid
+            loading.style.display = 'block';
+            loading.textContent = 'Sedang memeriksa CCTV yang aktif...';
+            info.textContent = '';
+            activeCount = 0;
+            checkedCount = 0;
+
+            cctvList.forEach(cctv => {
+                const fullUrl = BASE_URL + cctv.value;
+                checkStreamActive(fullUrl, isActive => {
+                    if (isActive) addThumbnail(cctv, fullUrl);
+                    checkedCount++;
+                    if (checkedCount === cctvList.length) {
+                        loading.style.display = 'none';
+                        info.textContent = `Menampilkan ${activeCount} CCTV aktif dari ${cctvList.length}`;
+                    }
+                });
             });
-        });
+        }
 
         function openModal(name, url) {
             modal.style.display = 'block';
@@ -141,7 +255,16 @@
             videoPlayer.muted = false;
 
             if (Hls.isSupported()) {
-                const hls = new Hls();
+                const hls = new Hls({
+                    xhrSetup: (xhr) => {
+                        xhr.setRequestHeader('Referer', 'https://bekasikota.go.id/');
+                        xhr.setRequestHeader('Origin', 'https://bekasikota.go.id/');
+                    },
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    fragLoadingTimeOut: 20000,
+                    manifestLoadingTimeOut: 20000
+                });
                 hls.loadSource(url);
                 hls.attachMedia(videoPlayer);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play().catch(console.log));
@@ -157,7 +280,14 @@
             videoPlayer.src = '';
         }
 
+        function refreshCCTV() {
+            loadCCTV();
+        }
+
         window.onclick = e => { if (e.target === modal) closeModal(); };
+
+        // Load pertama kali
+        loadCCTV();
     </script>
 </body>
 </html>
