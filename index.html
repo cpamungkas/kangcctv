@@ -1,1295 +1,922 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0b1120">
-    <title>KangCCTV — Pantau Kota Bekasi</title>
-    <style>
-        :root {
-            color-scheme: dark;
-            --bg: #0b1120;
-            --panel: #111a2b;
-            --panel-2: #172238;
-            --border: #26344b;
-            --text: #e7edf7;
-            --muted: #91a0b8;
-            --blue: #60a5fa;
-            --blue-strong: #3b82f6;
-            --green: #34d399;
-            --red: #fb7185;
-            --shadow: 0 14px 36px rgba(0, 0, 0, .22);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: radial-gradient(ellipse at top, #14213b 0, var(--bg) 48%);
-            color: var(--text);
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        button,
-        input,
-        select {
-            font: inherit;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        .camera-card:focus-visible {
-            outline: 2px solid var(--blue);
-            outline-offset: 3px;
-        }
-
-        .shell {
-            width: min(1480px, 100%);
-            margin: auto;
-            padding: 24px clamp(14px, 3vw, 36px) 40px;
-        }
-
-        .topbar {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 28px;
-        }
-
-        .brand-mark {
-            width: 48px;
-            height: 48px;
-            display: grid;
-            place-items: center;
-            flex: 0 0 auto;
-            border: 1px solid #3975bd;
-            border-radius: 15px;
-            background: linear-gradient(145deg, #2563eb, #172554);
-            box-shadow: 0 8px 24px #1d4ed833;
-            font-size: 23px;
-        }
-
-        .brand-name {
-            margin: 0;
-            font-size: 1.35rem;
-            letter-spacing: -.035em;
-        }
-
-        .eyebrow {
-            margin: 4px 0 0;
-            color: var(--muted);
-            font-size: .72rem;
-            letter-spacing: .14em;
-            font-weight: 700;
-        }
-
-        .topbar-spacer {
-            flex: 1;
-        }
-
-        .icon-button,
-        .secondary-button,
-        .primary-button,
-        .filter-button {
-            border: 1px solid var(--border);
-            border-radius: 11px;
-            color: var(--text);
-            background: var(--panel-2);
-            transition: .18s ease;
-        }
-
-        .icon-button {
-            width: 42px;
-            height: 42px;
-            display: grid;
-            place-items: center;
-            font-size: 1.05rem;
-        }
-
-        .icon-button:hover,
-        .secondary-button:hover,
-        .filter-button:hover {
-            border-color: #52719e;
-            background: #1b2a43;
-        }
-
-        .hero {
-            display: flex;
-            justify-content: space-between;
-            align-items: end;
-            gap: 20px;
-            margin-bottom: 22px;
-        }
-
-        .hero h2 {
-            font-size: clamp(1.65rem, 3vw, 2.5rem);
-            letter-spacing: -.05em;
-            line-height: 1.1;
-            margin: 0 0 10px;
-        }
-
-        .hero p {
-            max-width: 650px;
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.65;
-        }
-
-        .source-link {
-            color: var(--blue);
-            text-decoration: none;
-            white-space: nowrap;
-            font-size: .9rem;
-        }
-
-        .source-link:hover {
-            text-decoration: underline;
-        }
-
-        .toolbar {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            background: #0f192aeb;
-            box-shadow: var(--shadow);
-            margin-bottom: 16px;
-        }
-
-        .search-wrap {
-            flex: 1 1 250px;
-            min-width: 180px;
-            position: relative;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 13px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--muted);
-            pointer-events: none;
-        }
-
-        #search {
-            width: 100%;
-            height: 43px;
-            padding: 0 42px 0 39px;
-            background: #0b1322;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-        }
-
-        #clear-search {
-            position: absolute;
-            right: 7px;
-            top: 5px;
-            width: 32px;
-            height: 32px;
-            background: transparent;
-            border: 0;
-            color: var(--muted);
-            font-size: 1.2rem;
-        }
-
-        .secondary-button,
-        .primary-button,
-        .filter-button {
-            min-height: 42px;
-            padding: 0 13px;
-            font-weight: 650;
-            font-size: .88rem;
-        }
-
-        .primary-button {
-            border-color: #3b82f6;
-            background: var(--blue-strong);
-            color: white;
-        }
-
-        .primary-button:hover {
-            background: #2563eb;
-        }
-
-        .filter-button[aria-pressed="true"] {
-            background: #1d3b65;
-            border-color: #478ce3;
-            color: #bfdbfe;
-        }
-
-        .summary-row {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 16px 2px 20px;
-            color: var(--muted);
-            font-size: .88rem;
-        }
-
-        .summary-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 6px 10px;
-            background: #111a2b;
-            border: 1px solid var(--border);
-            border-radius: 999px;
-        }
-
-        .summary-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--blue);
-        }
-
-        .summary-spacer {
-            flex: 1;
-        }
-
-        #sort {
-            background: var(--panel);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            padding: 8px 10px;
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin: 26px 0 13px;
-        }
-
-        .section-title h3 {
-            font-size: 1rem;
-            margin: 0;
-            letter-spacing: -.015em;
-        }
-
-        .section-title span {
-            color: var(--muted);
-            font-size: .82rem;
-        }
-
-        .watch-layout {
-            display: grid;
-            grid-template-columns: minmax(0, 1.7fr) minmax(270px, .8fr);
-            gap: 18px;
-            align-items: start;
-        }
-
-        .panel {
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            background: linear-gradient(180deg, #121d30, #0e1727);
-            box-shadow: var(--shadow);
-            min-width: 0;
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 16px 18px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .panel-header h3 {
-            margin: 0 0 5px;
-            font-size: 1rem;
-            line-height: 1.35;
-            overflow-wrap: anywhere;
-        }
-
-        .panel-header p {
-            margin: 0;
-            color: var(--muted);
-            font-size: .82rem;
-        }
-
-        .player-wrap {
-            background: #030712;
-            position: relative;
-        }
-
-        #player {
-            display: block;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            max-height: 66vh;
-            background: #030712;
-            object-fit: contain;
-        }
-
-        .player-placeholder {
-            aspect-ratio: 16 / 9;
-            display: grid;
-            place-items: center;
-            padding: 24px;
-            text-align: center;
-            background: radial-gradient(ellipse at center, #16243b, #030712 72%);
-            color: var(--muted);
-        }
-
-        .placeholder-inner {
-            max-width: 300px;
-        }
-
-        .placeholder-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-        }
-
-        .placeholder-inner strong {
-            display: block;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-
-        .player-controls {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 13px 15px;
-            border-top: 1px solid var(--border);
-        }
-
-        .player-controls .secondary-button {
-            min-height: 36px;
-            padding: 0 10px;
-            font-size: .82rem;
-        }
-
-        .player-controls .spacer {
-            flex: 1;
-        }
-
-        .player-message {
-            min-height: 34px;
-            padding: 0 16px 13px;
-            color: var(--muted);
-            font-size: .82rem;
-            line-height: 1.5;
-        }
-
-        .player-message.error {
-            color: #fda4af;
-        }
-
-        .camera-list {
-            display: grid;
-            gap: 0;
-            max-height: 580px;
-            overflow: auto;
-        }
-
-        .camera-row {
-            display: flex;
-            gap: 11px;
-            align-items: center;
-            text-align: left;
-            width: 100%;
-            padding: 12px;
-            color: var(--text);
-            border: 0;
-            border-bottom: 1px solid #26344b99;
-            background: transparent;
-        }
-
-        .camera-row:last-child {
-            border-bottom: 0;
-        }
-
-        .camera-row:hover {
-            background: #17263d;
-        }
-
-        .camera-row.active {
-            background: #17345a;
-            box-shadow: inset 3px 0 var(--blue);
-        }
-
-        .camera-row img {
-            width: 82px;
-            height: 54px;
-            flex: 0 0 auto;
-            border-radius: 8px;
-            object-fit: cover;
-            background: #030712;
-        }
-
-        .camera-row-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .camera-row-name {
-            display: block;
-            font-size: .83rem;
-            line-height: 1.4;
-            font-weight: 700;
-            overflow-wrap: anywhere;
-        }
-
-        .camera-row-sub {
-            display: block;
-            color: var(--muted);
-            font-size: .72rem;
-            margin-top: 5px;
-        }
-
-        .camera-row-fav {
-            color: #fbbf24;
-            font-size: 1rem;
-        }
-
-        .camera-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        .camera-card {
-            min-width: 0;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-            background: var(--panel);
-            cursor: pointer;
-            transition: transform .18s, border-color .18s, box-shadow .18s;
-        }
-
-        .camera-card:hover {
-            transform: translateY(-3px);
-            border-color: #4c78b6;
-            box-shadow: 0 10px 25px #0003;
-        }
-
-        .camera-card.selected {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 1px #60a5fa55;
-        }
-
-        .thumb-wrap {
-            position: relative;
-            background: #030712;
-        }
-
-        .camera-card img {
-            display: block;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            object-fit: cover;
-            background: #030712;
-        }
-
-        .thumb-label {
-            position: absolute;
-            left: 8px;
-            bottom: 8px;
-            background: #030712d9;
-            color: #dbeafe;
-            padding: 4px 7px;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            font-size: .67rem;
-        }
-
-        .card-favorite {
-            position: absolute;
-            right: 8px;
-            top: 8px;
-            width: 31px;
-            height: 31px;
-            display: grid;
-            place-items: center;
-            border: 1px solid #475569;
-            border-radius: 9px;
-            color: white;
-            background: #030712d9;
-            font-size: 1rem;
-        }
-
-        .card-favorite.is-favorite {
-            color: #fbbf24;
-            border-color: #a16207;
-        }
-
-        .camera-card-body {
-            padding: 12px;
-        }
-
-        .camera-card h4 {
-            margin: 0 0 10px;
-            font-size: .86rem;
-            line-height: 1.45;
-            min-height: 2.5em;
-            overflow-wrap: anywhere;
-        }
-
-        .card-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .watch-link {
-            color: #93c5fd;
-            font-size: .78rem;
-            font-weight: 700;
-        }
-
-        .mini-share {
-            color: var(--muted);
-            border: 0;
-            background: transparent;
-            padding: 4px;
-            font-size: .9rem;
-        }
-
-        .empty {
-            grid-column: 1 / -1;
-            padding: 32px 18px;
-            text-align: center;
-            color: var(--muted);
-            border: 1px dashed var(--border);
-            border-radius: 14px;
-            background: #111a2b88;
-            line-height: 1.6;
-        }
-
-        footer {
-            border-top: 1px solid var(--border);
-            margin-top: 34px;
-            padding-top: 20px;
-            color: var(--muted);
-            font-size: .8rem;
-            line-height: 1.7;
-            text-align: center;
-        }
-
-        footer a {
-            color: var(--blue);
-            text-decoration: none;
-        }
-
-        .toast {
-            position: fixed;
-            z-index: 2000;
-            left: 50%;
-            bottom: 24px;
-            transform: translate(-50%, 20px);
-            opacity: 0;
-            pointer-events: none;
-            transition: .2s;
-            background: #e2e8f0;
-            color: #0f172a;
-            border-radius: 10px;
-            padding: 11px 16px;
-            box-shadow: var(--shadow);
-            font-size: .88rem;
-            max-width: calc(100% - 28px);
-            text-align: center;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        @media (max-width: 1120px) {
-            .camera-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-
-            .watch-layout {
-                grid-template-columns: minmax(0, 1.35fr) minmax(260px, .85fr);
-            }
-        }
-
-        @media (max-width: 820px) {
-            .watch-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .camera-list {
-                max-height: 330px;
-            }
-
-            .camera-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-
-            .hero {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-        }
-
-        @media (max-width: 560px) {
-            .shell {
-                padding: 16px 12px 30px;
-            }
-
-            .topbar {
-                margin-bottom: 23px;
-            }
-
-            .brand-mark {
-                width: 42px;
-                height: 42px;
-                border-radius: 13px;
-            }
-
-            .brand-name {
-                font-size: 1.18rem;
-            }
-
-            .eyebrow {
-                font-size: .62rem;
-            }
-
-            .hero h2 {
-                font-size: 1.8rem;
-            }
-
-            .toolbar {
-                padding: 9px;
-                gap: 8px;
-            }
-
-            .search-wrap {
-                flex-basis: 100%;
-            }
-
-            .toolbar .secondary-button,
-            .toolbar .filter-button {
-                flex: 1;
-                padding: 0 9px;
-                font-size: .8rem;
-            }
-
-            .camera-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 10px;
-            }
-
-            .camera-card-body {
-                padding: 9px;
-            }
-
-            .camera-card h4 {
-                font-size: .8rem;
-            }
-
-            .camera-row img {
-                width: 72px;
-                height: 49px;
-            }
-
-            .panel-header {
-                padding: 13px;
-            }
-
-            .player-controls {
-                padding: 10px;
-            }
-
-            .player-controls .spacer {
-                display: none;
-            }
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1120">
+  <title>KangCCTV — Pantau Jabodetabek</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1120;
+      --panel: #111a2b;
+      --panel-2: #172238;
+      --border: #26344b;
+      --text: #e7edf7;
+      --muted: #91a0b8;
+      --blue: #60a5fa;
+      --blue-strong: #3b82f6;
+      --green: #34d399;
+      --red: #fb7185;
+      --shadow: 0 14px 36px rgba(0, 0, 0, .22);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: radial-gradient(ellipse at top, #14213b 0, var(--bg) 48%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, .camera-card:focus-visible {
+      outline: 2px solid var(--blue); outline-offset: 3px;
+    }
+    .shell { width: min(1480px, 100%); margin: auto; padding: 24px clamp(14px, 3vw, 36px) 40px; }
+    .topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+    .brand-mark {
+      width: 48px; height: 48px; display: grid; place-items: center; flex: 0 0 auto;
+      border: 1px solid #3975bd; border-radius: 15px;
+      background: linear-gradient(145deg, #2563eb, #172554);
+      box-shadow: 0 8px 24px #1d4ed833; font-size: 23px;
+    }
+    .brand-name { margin: 0; font-size: 1.35rem; letter-spacing: -.035em; }
+    .eyebrow { margin: 4px 0 0; color: var(--muted); font-size: .72rem; letter-spacing: .14em; font-weight: 700; }
+    .topbar-spacer { flex: 1; }
+    .icon-button, .secondary-button, .primary-button, .filter-button {
+      border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+      background: var(--panel-2); transition: .18s ease;
+    }
+    .icon-button { width: 42px; height: 42px; display: grid; place-items: center; font-size: 1.05rem; }
+    .icon-button:hover, .secondary-button:hover, .filter-button:hover { border-color: #52719e; background: #1b2a43; }
+    .hero { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 22px; }
+    .hero h2 { font-size: clamp(1.65rem, 3vw, 2.5rem); letter-spacing: -.05em; line-height: 1.1; margin: 0 0 10px; }
+    .hero p { max-width: 650px; margin: 0; color: var(--muted); line-height: 1.65; }
+    .source-link { color: var(--blue); text-decoration: none; white-space: nowrap; font-size: .9rem; }
+    .source-link:hover { text-decoration: underline; }
+    .toolbar {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+      padding: 12px; border: 1px solid var(--border); border-radius: 16px;
+      background: #0f192aeb; box-shadow: var(--shadow); margin-bottom: 16px;
+    }
+    .search-wrap { flex: 1 1 250px; min-width: 180px; position: relative; }
+    .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    #search {
+      width: 100%; height: 43px; padding: 0 42px 0 39px;
+      background: #0b1322; border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+    }
+    #clear-search { position: absolute; right: 7px; top: 5px; width: 32px; height: 32px; background: transparent; border: 0; color: var(--muted); font-size: 1.2rem; }
+    .secondary-button, .primary-button, .filter-button { min-height: 42px; padding: 0 13px; font-weight: 650; font-size: .88rem; }
+    .primary-button { border-color: #3b82f6; background: var(--blue-strong); color: white; }
+    .primary-button:hover { background: #2563eb; }
+    .filter-button[aria-pressed="true"] { background: #1d3b65; border-color: #478ce3; color: #bfdbfe; }
+    .summary-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 16px 2px 20px; color: var(--muted); font-size: .88rem; }
+    .summary-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; background: #111a2b; border: 1px solid var(--border); border-radius: 999px; }
+    .summary-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+    .summary-spacer { flex: 1; }
+    #sort, #source-filter { background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 8px 10px; }
+    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 26px 0 13px; }
+    .section-title h3 { font-size: 1rem; margin: 0; letter-spacing: -.015em; }
+    .section-title span { color: var(--muted); font-size: .82rem; }
+    .watch-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(270px, .8fr); gap: 18px; align-items: start; }
+    .panel { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: linear-gradient(180deg, #121d30, #0e1727); box-shadow: var(--shadow); min-width: 0; }
+    .panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .panel-header h3 { margin: 0 0 5px; font-size: 1rem; line-height: 1.35; overflow-wrap: anywhere; }
+    .panel-header p { margin: 0; color: var(--muted); font-size: .82rem; }
+    .player-wrap { background: #030712; position: relative; }
+    #player, #dki-frame { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: 66vh; background: #030712; object-fit: contain; border: 0; }
+    .player-placeholder {
+      aspect-ratio: 16 / 9; display: grid; place-items: center; padding: 24px; text-align: center;
+      background: radial-gradient(ellipse at center, #16243b, #030712 72%); color: var(--muted);
+    }
+    .placeholder-inner { max-width: 300px; }
+    .placeholder-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .placeholder-inner strong { display: block; color: var(--text); margin-bottom: 6px; }
+    .player-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 13px 15px; border-top: 1px solid var(--border); }
+    .player-controls .secondary-button { min-height: 36px; padding: 0 10px; font-size: .82rem; }
+    .player-controls .spacer { flex: 1; }
+    .player-message { min-height: 34px; padding: 0 16px 13px; color: var(--muted); font-size: .82rem; line-height: 1.5; }
+    .player-message.error { color: #fda4af; }
+    .camera-list { display: grid; gap: 0; max-height: 580px; overflow: auto; }
+    .camera-row { display: flex; gap: 11px; align-items: center; text-align: left; width: 100%; padding: 12px; color: var(--text); border: 0; border-bottom: 1px solid #26344b99; background: transparent; }
+    .camera-row:last-child { border-bottom: 0; }
+    .camera-row:hover { background: #17263d; }
+    .camera-row.active { background: #17345a; box-shadow: inset 3px 0 var(--blue); }
+    .camera-row img, .camera-row-thumb { width: 82px; height: 54px; flex: 0 0 auto; border-radius: 8px; object-fit: cover; background: #030712; overflow: hidden; }
+    .camera-row-thumb { position: relative; display: block; }
+    .camera-row-thumb iframe { display: none; }
+    .camera-row-thumb .thumb-fallback { display: grid; place-items: center; width: 100%; height: 100%; color: #93c5fd; font-size: 1.15rem; background: radial-gradient(ellipse at center, #1b2c47, #030712); }
+    .camera-row-info { min-width: 0; flex: 1; }
+    .camera-row-name { display: block; font-size: .83rem; line-height: 1.4; font-weight: 700; overflow-wrap: anywhere; }
+    .camera-row-sub { display: block; color: var(--muted); font-size: .72rem; margin-top: 5px; }
+    .camera-row-fav { color: #fbbf24; font-size: 1rem; }
+    .view-switch { display:flex; gap:8px; margin: 14px 0; flex-wrap:wrap; }
+    .view-panel { border:1px solid var(--border); border-radius:16px; overflow:hidden; background:var(--panel); box-shadow:var(--shadow); }
+    #map { width:100%; height:min(58vh,560px); min-height:340px; background:#172238; }
+    .map-caption { padding:10px 14px; color:var(--muted); font-size:.8rem; border-top:1px solid var(--border); }
+    .weather-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 20px; }
+    .weather-card { border:1px solid var(--border); border-radius:14px; background:linear-gradient(145deg,#14233b,#101827); padding:14px 16px; min-width:0; }
+    .weather-top { display:flex; justify-content:space-between; gap:8px; align-items:center; color:var(--muted); font-size:.8rem; }
+    .weather-main { display:flex; align-items:center; gap:12px; margin:8px 0; }
+    .weather-icon { font-size:1.8rem; } .weather-temp { font-size:1.8rem; font-weight:800; letter-spacing:-.05em; }
+    .weather-details { color:var(--muted); font-size:.78rem; line-height:1.6; }
+    .map-popup-button { border:0; background:#2563eb; color:white; padding:6px 9px; border-radius:7px; margin-top:7px; cursor:pointer; }
+    .map-legend { display:flex; gap:14px; flex-wrap:wrap; padding:10px 14px; font-size:.8rem; color:var(--muted); }
+    .legend-dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; }
+    .camera-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .camera-card { min-width: 0; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--panel); cursor: pointer; transition: transform .18s, border-color .18s, box-shadow .18s; }
+    .camera-card:hover { transform: translateY(-3px); border-color: #4c78b6; box-shadow: 0 10px 25px #0003; }
+    .camera-card.selected { border-color: var(--blue); box-shadow: 0 0 0 1px #60a5fa55; }
+    .thumb-wrap { position: relative; background: #030712; }
+    .camera-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #030712; }
+    .camera-card img.no-thumbnail { visibility: hidden; }
+    .live-thumb-frame { display:none; }
+    .camera-placeholder { display:grid; place-items:center; width:100%; aspect-ratio:16/9; color:#93c5fd; background:radial-gradient(ellipse at center,#1b2c47,#030712); font-size:1.7rem; }
+    .thumb-wrap { aspect-ratio: 16 / 9; overflow: hidden; }
+    .camera-row img.no-thumbnail { visibility: hidden; }
+    .thumb-wrap:has(img.no-thumbnail)::before { content: '▶ CCTV DKI JAKARTA'; position: absolute; inset: 0; display: grid; place-items: center; color: #93c5fd; font-size: .8rem; letter-spacing: .08em; background: radial-gradient(ellipse at center, #1b2c47, #030712); }
+    .thumb-label { position: absolute; left: 8px; bottom: 8px; background: #030712d9; color: #dbeafe; padding: 4px 7px; border: 1px solid #334155; border-radius: 6px; font-size: .67rem; }
+    .card-favorite { position: absolute; right: 8px; top: 8px; width: 31px; height: 31px; display: grid; place-items: center; border: 1px solid #475569; border-radius: 9px; color: white; background: #030712d9; font-size: 1rem; }
+    .card-favorite.is-favorite { color: #fbbf24; border-color: #a16207; }
+    .camera-card-body { padding: 12px; }
+    .camera-card h4 { margin: 0 0 10px; font-size: .86rem; line-height: 1.45; min-height: 2.5em; overflow-wrap: anywhere; }
+    .card-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .watch-link { color: #93c5fd; font-size: .78rem; font-weight: 700; }
+    .mini-share { color: var(--muted); border: 0; background: transparent; padding: 5px; display: inline-grid; place-items: center; border-radius: 7px; }
+    .mini-share:hover { color: var(--blue); background: #1b2a43; }
+    .share-icon { display: block; width: 18px; height: 18px; fill: currentColor; }
+    .empty { grid-column: 1 / -1; padding: 32px 18px; text-align: center; color: var(--muted); border: 1px dashed var(--border); border-radius: 14px; background: #111a2b88; line-height: 1.6; }
+    footer { border-top: 1px solid var(--border); margin-top: 34px; padding-top: 20px; color: var(--muted); font-size: .8rem; line-height: 1.7; text-align: center; }
+    footer a { color: var(--blue); text-decoration: none; }
+    .toast { position: fixed; z-index: 2000; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; transition: .2s; background: #e2e8f0; color: #0f172a; border-radius: 10px; padding: 11px 16px; box-shadow: var(--shadow); font-size: .88rem; max-width: calc(100% - 28px); text-align: center; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .hidden { display: none !important; }
+    @media (max-width: 1120px) { .camera-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .watch-layout { grid-template-columns: minmax(0, 1.35fr) minmax(260px, .85fr); } }
+    @media (max-width: 820px) { .watch-layout { grid-template-columns: 1fr; } .camera-list { max-height: 330px; } .camera-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hero { align-items: flex-start; flex-direction: column; } }
+    @media (max-width: 560px) {
+      #map { height: 48vh; min-height:280px; } .weather-row { grid-template-columns:1fr; }
+      .shell { padding: 16px 12px 30px; } .topbar { margin-bottom: 23px; } .brand-mark { width: 42px; height: 42px; border-radius: 13px; }
+      .brand-name { font-size: 1.18rem; } .eyebrow { font-size: .62rem; } .hero h2 { font-size: 1.8rem; }
+      .toolbar { padding: 9px; gap: 8px; } .search-wrap { flex-basis: 100%; } .toolbar .secondary-button, .toolbar .filter-button { flex: 1; padding: 0 9px; font-size: .8rem; }
+      .camera-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .camera-card-body { padding: 9px; } .camera-card h4 { font-size: .8rem; }
+      .camera-row img { width: 72px; height: 49px; } .panel-header { padding: 13px; } .player-controls { padding: 10px; } .player-controls .spacer { display: none; }
+    }
+  </style>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
-
 <body>
-    <div class="shell">
-        <header class="topbar">
-            <div class="brand-mark" aria-hidden="true">📹</div>
-            <div>
-                <h1 class="brand-name">KangCCTV</h1>
-                <p class="eyebrow">LIVE CAMERA DIRECTORY · KOTA BEKASI</p>
-            </div>
-            <div class="topbar-spacer"></div>
-            <button class="icon-button" id="refresh" type="button" title="Muat ulang daftar kamera"
-                aria-label="Muat ulang daftar kamera">↻</button>
-        </header>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">📹</div>
+      <div>
+        <h1 class="brand-name">KangCCTV</h1>
+        <p class="eyebrow">LIVE CAMERA DIRECTORY · BEKASI & DKI JAKARTA</p>
+      </div>
+      <div class="topbar-spacer"></div>
+      <button class="icon-button" id="refresh" type="button" title="Muat ulang daftar kamera" aria-label="Muat ulang daftar kamera">↻</button>
+    </header>
 
-        <section class="hero">
-            <div>
-                <h2>Pantau Kota Bekasi<span style="color:var(--blue)">.</span></h2>
-                <p>Temukan kamera jalan dan landmark Bekasi dalam satu tempat. Pilih kamera untuk mulai menonton live
-                    stream.</p>
-            </div>
-            <a class="source-link" href="https://www.bekasikota.go.id/cctv/" target="_blank"
-                rel="noopener noreferrer">Situs CCTV resmi ↗</a>
-        </section>
+    <section class="hero">
+      <div>
+        <h2>Pantau Jabodetabek<span style="color:var(--blue)">.</span></h2>
+        <p>Jelajahi CCTV jalan Bekasi dan DKI Jakarta dalam satu dashboard. Pilih kamera untuk membuka live stream.</p>
+      </div>
+      <a class="source-link" href="https://www.bekasikota.go.id/cctv/" target="_blank" rel="noopener noreferrer">Situs CCTV resmi ↗</a>
+    </section>
 
-        <section class="toolbar" aria-label="Pencarian dan filter kamera">
-            <div class="search-wrap">
-                <span class="search-icon" aria-hidden="true">⌕</span>
-                <input id="search" type="search" placeholder="Cari jalan atau lokasi CCTV..." autocomplete="off"
-                    aria-label="Cari lokasi CCTV">
-                <button id="clear-search" type="button" aria-label="Hapus pencarian" title="Hapus pencarian">×</button>
-            </div>
-            <button class="filter-button" id="all-filter" type="button" aria-pressed="true">Semua kamera</button>
-            <button class="filter-button" id="favorites-filter" type="button" aria-pressed="false">♡ Favorit <span
-                    id="favorite-count">0</span></button>
-            <button class="secondary-button" id="refresh-data" type="button">↻ Refresh data</button>
-        </section>
+    <section class="toolbar" aria-label="Pencarian dan filter kamera">
+      <div class="search-wrap">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input id="search" type="search" placeholder="Cari jalan atau lokasi CCTV..." autocomplete="off" aria-label="Cari lokasi CCTV">
+        <button id="clear-search" type="button" aria-label="Hapus pencarian" title="Hapus pencarian">×</button>
+      </div>
+      <button class="filter-button" id="all-filter" type="button" aria-pressed="true">Semua kamera</button>
+      <select id="source-filter" aria-label="Filter wilayah"><option value="all">Semua wilayah</option><option value="bekasi">Bekasi</option><option value="dki">DKI Jakarta</option></select>
+      <button class="filter-button" id="favorites-filter" type="button" aria-pressed="false">♡ Favorit <span id="favorite-count">0</span></button>
+      <button class="secondary-button" id="refresh-data" type="button">↻ Refresh data</button>
+    </section>
 
-        <div class="summary-row">
-            <span class="summary-pill"><span class="summary-dot"></span><span id="camera-count">Memuat
-                    kamera...</span></span>
-            <span id="last-updated">Mengambil daftar terbaru</span>
-            <span class="summary-spacer"></span>
-            <label for="sort">Urutkan</label>
-            <select id="sort" aria-label="Urutkan kamera">
-                <option value="source">Urutan sumber</option>
-                <option value="az">Nama A–Z</option>
-                <option value="za">Nama Z–A</option>
-            </select>
-        </div>
-
-        <section id="watch-section">
-            <div class="section-title">
-                <h3>Sedang ditonton</h3>
-                <span id="selected-label">Pilih kamera dari daftar</span>
-            </div>
-            <div class="watch-layout">
-                <section class="panel" aria-label="Pemutar CCTV">
-                    <div class="panel-header">
-                        <div>
-                            <h3 id="player-title">Belum ada kamera dipilih</h3>
-                            <p id="player-location">Pilih kartu kamera untuk mulai menonton</p>
-                        </div>
-                        <button class="icon-button" id="share-current" type="button" title="Bagikan kamera"
-                            aria-label="Bagikan kamera saat ini" disabled>↗</button>
-                    </div>
-                    <div class="player-wrap" id="player-wrap">
-                        <div class="player-placeholder" id="player-placeholder">
-                            <div class="placeholder-inner">
-                                <div class="placeholder-icon">◉</div>
-                                <strong>CCTV Kota Bekasi</strong>
-                                <span>Pilih lokasi kamera di bawah untuk memulai live stream.</span>
-                            </div>
-                        </div>
-                        <video id="player" class="hidden" controls playsinline preload="metadata"></video>
-                    </div>
-                    <div class="player-controls">
-                        <button class="secondary-button" id="previous-camera" type="button" disabled>←
-                            Sebelumnya</button>
-                        <button class="secondary-button" id="next-camera" type="button" disabled>Berikutnya →</button>
-                        <span class="spacer"></span>
-                        <button class="secondary-button" id="fullscreen" type="button" disabled>⛶ Fullscreen</button>
-                    </div>
-                    <div class="player-message" id="player-message" role="status" aria-live="polite">Stream belum
-                        dimulai. Status kamera tidak diasumsikan aktif hanya dari daftar sumber.</div>
-                </section>
-
-                <aside class="panel" aria-label="Daftar kamera">
-                    <div class="panel-header">
-                        <div>
-                            <h3>Daftar kamera</h3>
-                            <p id="sidebar-count">Menunggu data...</p>
-                        </div>
-                    </div>
-                    <div class="camera-list" id="camera-list">
-                        <div class="empty">Sedang mengambil daftar CCTV...</div>
-                    </div>
-                </aside>
-            </div>
-        </section>
-
-        <section>
-            <div class="section-title">
-                <h3 id="grid-heading">Jelajahi kamera</h3>
-                <span id="result-count"></span>
-            </div>
-            <div class="camera-grid" id="camera-grid">
-                <div class="empty">Memuat daftar CCTV...</div>
-            </div>
-        </section>
-
-        <footer>
-            <div>KangCCTV adalah direktori independen dan bukan situs resmi Pemerintah Kota Bekasi.</div>
-            <div>Data lokasi, thumbnail, dan stream mengikuti ketersediaan sumber. Kamera yang tercantum belum tentu
-                sedang aktif.</div>
-            <div><a href="https://www.bekasikota.go.id/cctv/" target="_blank" rel="noopener noreferrer">Kunjungi CCTV
-                    resmi Pemkot Bekasi ↗</a></div>
-        </footer>
+    <div class="summary-row">
+      <span class="summary-pill"><span class="summary-dot"></span><span id="camera-count">Memuat kamera...</span></span>
+      <span id="last-updated">Mengambil daftar terbaru</span>
+      <span class="summary-spacer"></span>
+      <label for="sort">Urutkan</label>
+      <select id="sort" aria-label="Urutkan kamera">
+        <option value="source">Urutan sumber</option>
+        <option value="az">Nama A–Z</option>
+        <option value="za">Nama Z–A</option>
+      </select>
     </div>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script>
-        'use strict';
+    <div class="view-switch" aria-label="Mode tampilan">
+      <button class="filter-button" id="map-view-btn" type="button" aria-pressed="true">⌖ Tampilan peta</button>
+      <button class="filter-button" id="grid-view-btn" type="button" aria-pressed="false">▦ Tampilan grid</button>
+    </div>
+    <section class="weather-row" aria-label="Informasi cuaca">
+      <article class="weather-card" id="weather-bekasi"><div class="weather-top"><strong>Cuaca Kota Bekasi</strong><span>Memuat…</span></div><div class="weather-details">Mengambil informasi cuaca…</div></article>
+      <article class="weather-card" id="weather-jakarta"><div class="weather-top"><strong>Cuaca DKI Jakarta</strong><span>Memuat…</span></div><div class="weather-details">Mengambil informasi cuaca…</div></article>
+    </section>
+    <section id="map-section" class="view-panel">
+      <div id="map" role="application" aria-label="Peta lokasi kamera CCTV"></div>
+      <div class="map-legend"><span><i class="legend-dot" style="background:#3b82f6"></i>Bekasi</span><span><i class="legend-dot" style="background:#f59e0b"></i>DKI Jakarta</span><span id="map-marker-count">Menyiapkan marker…</span></div>
+      <div class="map-caption">Marker hanya ditampilkan jika lokasi kamera berhasil dicocokkan. Titik yang berdasarkan nama kawasan dapat bersifat perkiraan; cek lokasi sebelum mengandalkannya untuk navigasi.</div>
+    </section>
 
-        const DATA_URL = 'https://eofficev2.bekasikota.go.id/backupcctv/m3/list.json';
-        const STREAM_BASE = 'https://eofficev2.bekasikota.go.id/backupcctv/m3/';
-        const FAVORITES_KEY = 'kangcctv:favorites:v1';
+    <section id="watch-section">
+      <div class="section-title">
+        <h3>Sedang ditonton</h3>
+        <span id="selected-label">Pilih kamera dari daftar</span>
+      </div>
+      <div class="watch-layout">
+        <section class="panel" aria-label="Pemutar CCTV">
+          <div class="panel-header">
+            <div>
+              <h3 id="player-title">Belum ada kamera dipilih</h3>
+              <p id="player-location">Pilih kartu kamera untuk mulai menonton</p>
+            </div>
+            <button class="icon-button" id="share-current" type="button" title="Bagikan kamera" aria-label="Bagikan kamera saat ini" disabled><svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.7 2.3a.8.8 0 0 0-.84-.18L2.3 9.3a.8.8 0 0 0 .04 1.52l7.2 2.4 2.4 7.2a.8.8 0 0 0 1.52.04l7.18-18.56a.8.8 0 0 0-.94-1.6ZM12.2 18.1l-1.55-4.66 5.03-5.03-6.2 4.18-4.66-1.55 13.48-5.22-6.1 12.28Z"/></svg></button>
+          </div>
+          <div class="player-wrap" id="player-wrap">
+            <div class="player-placeholder" id="player-placeholder">
+              <div class="placeholder-inner">
+                <div class="placeholder-icon">◉</div>
+                <strong>KangCCTV Jabodetabek</strong>
+                <span>Pilih kamera Bekasi atau DKI Jakarta untuk memulai live stream.</span>
+              </div>
+            </div>
+            <video id="player" class="hidden" controls playsinline preload="metadata"></video>
+            <iframe id="dki-frame" class="hidden" title="CCTV DKI Jakarta" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </div>
+          <div class="player-controls">
+            <button class="secondary-button" id="previous-camera" type="button" disabled>← Sebelumnya</button>
+            <button class="secondary-button" id="next-camera" type="button" disabled>Berikutnya →</button>
+            <span class="spacer"></span>
+            <button class="secondary-button" id="fullscreen" type="button" disabled>⛶ Fullscreen</button>
+          </div>
+          <div class="player-message" id="player-message" role="status" aria-live="polite">Stream belum dimulai. Status kamera tidak diasumsikan aktif hanya dari daftar sumber.</div>
+        </section>
 
-        const $ = id => document.getElementById(id);
-        const els = {
-            search: $('search'), clearSearch: $('clear-search'), refresh: $('refresh'), refreshData: $('refresh-data'),
-            allFilter: $('all-filter'), favoritesFilter: $('favorites-filter'), favoriteCount: $('favorite-count'),
-            cameraCount: $('camera-count'), lastUpdated: $('last-updated'), sort: $('sort'),
-            playerTitle: $('player-title'), playerLocation: $('player-location'), player: $('player'),
-            placeholder: $('player-placeholder'), playerMessage: $('player-message'), shareCurrent: $('share-current'),
-            previous: $('previous-camera'), next: $('next-camera'), fullscreen: $('fullscreen'),
-            selectedLabel: $('selected-label'), cameraList: $('camera-list'), sidebarCount: $('sidebar-count'),
-            gridHeading: $('grid-heading'), resultCount: $('result-count'), cameraGrid: $('camera-grid'), toast: $('toast')
-        };
+        <aside class="panel" aria-label="Daftar kamera">
+          <div class="panel-header">
+            <div><h3>Daftar kamera</h3><p id="sidebar-count">Menunggu data...</p></div>
+          </div>
+          <div class="camera-list" id="camera-list">
+            <div class="empty">Sedang mengambil daftar CCTV...</div>
+          </div>
+        </aside>
+      </div>
+    </section>
 
-        let cameras = [];
-        let selectedCameraKey = null;
-        let hlsInstance = null;
-        let favorites = readFavorites();
-        let favoritesOnly = false;
-        let toastTimer = null;
+    <section>
+      <div class="section-title">
+        <h3 id="grid-heading">Jelajahi kamera</h3>
+        <span id="result-count"></span>
+      </div>
+      <div class="camera-grid" id="camera-grid">
+        <div class="empty">Memuat daftar CCTV...</div>
+      </div>
+    </section>
 
-        function readFavorites() {
-            try {
-                const value = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
-                return new Set(Array.isArray(value) ? value.filter(v => typeof v === 'string') : []);
-            } catch {return new Set();}
+    <footer>
+      <div>KangCCTV adalah direktori independen, bukan situs resmi pemerintah.</div>
+      <div>Data dan pemutaran kamera mengikuti ketersediaan sumber masing-masing. Kamera yang tercantum belum tentu sedang aktif.</div>
+      <div><a href="https://www.bekasikota.go.id/cctv/" target="_blank" rel="noopener noreferrer">CCTV resmi Pemkot Bekasi ↗</a> · <a href="https://jakcctv.jakarta.go.id/publik" target="_blank" rel="noopener noreferrer">CCTV Publik DKI Jakarta ↗</a></div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    'use strict';
+
+    const DATA_URL = 'https://eofficev2.bekasikota.go.id/backupcctv/m3/list.json';
+    const STREAM_BASE = 'https://eofficev2.bekasikota.go.id/backupcctv/m3/';
+    const DKI_DATA_URL = 'https://jakcctv.jakarta.go.id/publik/data';
+    const DKI_PAGE_COUNT = 7;
+    const DKI_FALLBACK = [
+      ['JKP POLDA JPO JL. GATOT SUBROTO 7','CCTV-01','502045_JKP_POLDA_JPO-JL.-GATOT-SUBROTO-7_CCTV-01'],
+      ['JKP POLDA JPO JL. GATOT SUBROTO 7','CCTV-02','502045_JKP_POLDA_JPO-JL.-GATOT-SUBROTO-7_CCTV-02'],
+      ['JKP POLDA JL. GERBANG PEMUDA C02','CCTV-01','502155_JKP_POLDA_JL.-GERBANG-PEMUDA-C02_CCTV-01'],
+      ['JKP POLDA JL. GERBANG PEMUDA C02','CCTV-02','502155_JKP_POLDA_JL.-GERBANG-PEMUDA-C02_CCTV-02'],
+      ['JKP POLDA JL. GERBANG PEMUDA C03','CCTV-01','502160_JKP_POLDA_JL.-GERBANG-PEMUDA-C03_CCTV-01'],
+      ['JKP POLDA JL. GERBANG PEMUDA C03','CCTV-02','502160_JKP_POLDA_JL.-GERBANG-PEMUDA-C03_CCTV-02'],
+      ['JKP SATPOL PP JL. GERBANG PEMUDA C04','CCTV-01','502506_JKP_SATPOL-PP_JL.-GERBANG-PEMUDA-C04_CCTV-01'],
+      ['JKP SATPOL PP JL. GERBANG PEMUDA C04','CCTV-02','502506_JKP_SATPOL-PP_JL.-GERBANG-PEMUDA-C04_CCTV-02']
+    ].map(([location, id, slug]) => ({ source: 'dki', location, id, name: `${location} · ${id}`, path: `https://dki-jkt.balitower.co.id:7028/${slug}/embed.html`, embedUrl: `https://dki-jkt.balitower.co.id:7028/${slug}/embed.html`, pic: '' }));
+    const FAVORITES_KEY = 'kangcctv:favorites:v1';
+
+    const $ = id => document.getElementById(id);
+    const els = {
+      search: $('search'), clearSearch: $('clear-search'), refresh: $('refresh'), refreshData: $('refresh-data'),
+      allFilter: $('all-filter'), favoritesFilter: $('favorites-filter'), favoriteCount: $('favorite-count'), sourceFilter: $('source-filter'),
+      cameraCount: $('camera-count'), lastUpdated: $('last-updated'), sort: $('sort'),
+      playerTitle: $('player-title'), playerLocation: $('player-location'), player: $('player'), dkiFrame: $('dki-frame'),
+      placeholder: $('player-placeholder'), playerMessage: $('player-message'), shareCurrent: $('share-current'),
+      previous: $('previous-camera'), next: $('next-camera'), fullscreen: $('fullscreen'),
+      selectedLabel: $('selected-label'), cameraList: $('camera-list'), sidebarCount: $('sidebar-count'),
+      gridHeading: $('grid-heading'), resultCount: $('result-count'), cameraGrid: $('camera-grid'), toast: $('toast'),
+      mapSection: $('map-section'), mapViewBtn: $('map-view-btn'), gridViewBtn: $('grid-view-btn'), mapMarkerCount: $('map-marker-count')
+    };
+
+    let cameras = [];
+    let selectedCameraKey = null;
+    let hlsInstance = null;
+    let favorites = readFavorites();
+    let favoritesOnly = false;
+    let toastTimer = null;
+    let mapInstance = null;
+    let mapMarkers = [];
+    let currentView = 'map';
+
+    function readFavorites() {
+      try {
+        const value = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+        return new Set(Array.isArray(value) ? value.filter(v => typeof v === 'string') : []);
+      } catch { return new Set(); }
+    }
+
+    function saveFavorites() {
+      try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
+        return true;
+      } catch {
+        showToast('Favorit tidak bisa disimpan di browser ini.');
+        return false;
+      }
+    }
+
+    function cameraKey(camera) {
+      return `${camera.source || 'bekasi'}:${camera.path || camera.name || ''}`;
+    }
+
+    function cameraName(camera) {
+      return String(camera.name || camera.path || 'CCTV tanpa nama')
+        .replace(/\.m3u8$/i, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function streamUrl(camera) {
+      if (camera.source === 'dki') return camera.embedUrl || camera.path || null;
+      const path = String(camera.path || '').trim();
+      if (!path || path.includes('..') || /^https?:/i.test(path)) return null;
+      return new URL(path, STREAM_BASE).href;
+    }
+
+    function safeImageUrl(value) {
+      if (typeof value !== 'string' || !value.trim()) return '';
+      try {
+        const url = new URL(value, location.href);
+        return url.protocol === 'https:' ? url.href : '';
+      } catch { return ''; }
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2600);
+    }
+
+    function setPlayerMessage(message, type = '') {
+      els.playerMessage.textContent = message;
+      els.playerMessage.classList.toggle('error', type === 'error');
+    }
+
+    function setBusy(busy) {
+      els.refresh.disabled = busy;
+      els.refreshData.disabled = busy;
+      els.cameraCount.textContent = busy ? 'Memuat daftar kamera...' : `${cameras.length} kamera terdaftar`;
+    }
+
+    function getFilteredCameras() {
+      const query = els.search.value.trim().toLocaleLowerCase('id');
+      let list = cameras.filter(camera => cameraName(camera).toLocaleLowerCase('id').includes(query));
+      if (els.sourceFilter.value !== 'all') list = list.filter(camera => (camera.source || 'bekasi') === els.sourceFilter.value);
+      if (favoritesOnly) list = list.filter(camera => favorites.has(cameraKey(camera)));
+      if (els.sort.value === 'az') list.sort((a, b) => cameraName(a).localeCompare(cameraName(b), 'id'));
+      if (els.sort.value === 'za') list.sort((a, b) => cameraName(b).localeCompare(cameraName(a), 'id'));
+      return list;
+    }
+
+    function makeImage(camera, className) {
+      const img = document.createElement('img');
+      img.className = className || '';
+      img.loading = 'lazy';
+      img.alt = `Pratinjau ${cameraName(camera)}`;
+      const imageUrl = safeImageUrl(camera.pic);
+      if (imageUrl) img.src = imageUrl;
+      else img.classList.add('no-thumbnail');
+      img.addEventListener('error', () => {
+        img.onerror = null;
+        img.removeAttribute('src');
+        img.alt = 'Thumbnail tidak tersedia';
+      }, { once: true });
+      return img;
+    }
+
+    function toggleFavorite(camera, event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      const key = cameraKey(camera);
+      if (favorites.has(key)) {
+        favorites.delete(key);
+        showToast('Dihapus dari favorit');
+      } else {
+        favorites.add(key);
+        showToast('Ditambahkan ke favorit');
+      }
+      saveFavorites();
+      updateFavoriteCount();
+      renderCameras();
+    }
+
+    function updateFavoriteCount() {
+      els.favoriteCount.textContent = String(favorites.size);
+      els.favoritesFilter.setAttribute('aria-pressed', String(favoritesOnly));
+      els.allFilter.setAttribute('aria-pressed', String(!favoritesOnly));
+    }
+
+    function renderSidebar(list) {
+      els.cameraList.replaceChildren();
+      els.sidebarCount.textContent = `${list.length} kamera ditampilkan`;
+      if (!list.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = favoritesOnly ? 'Belum ada kamera favorit yang cocok.' : 'Tidak ada kamera yang cocok dengan pencarian.';
+        els.cameraList.append(empty);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      list.forEach(camera => {
+        const key = cameraKey(camera);
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'camera-row' + (key === selectedCameraKey ? ' active' : '');
+        row.setAttribute('aria-current', key === selectedCameraKey ? 'true' : 'false');
+        if (camera.source === 'dki' && camera.embedUrl) {
+          const thumb = document.createElement('span');
+          thumb.className = 'camera-row-thumb';
+          thumb.innerHTML = '<span class="thumb-fallback" aria-hidden="true">📹</span>';
+          row.append(thumb);
+        } else {
+          row.append(makeImage(camera, ''));
         }
-
-        function saveFavorites() {
-            try {
-                localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
-                return true;
-            } catch {
-                showToast('Favorit tidak bisa disimpan di browser ini.');
-                return false;
-            }
+        const info = document.createElement('span');
+        info.className = 'camera-row-info';
+        const name = document.createElement('span');
+        name.className = 'camera-row-name';
+        name.textContent = cameraName(camera);
+        const sub = document.createElement('span');
+        sub.className = 'camera-row-sub';
+        sub.textContent = camera.source === 'dki' ? 'DKI Jakarta · embed resmi' : 'Bekasi · HLS';
+        info.append(name, sub);
+        row.append(info);
+        if (favorites.has(key)) {
+          const fav = document.createElement('span');
+          fav.className = 'camera-row-fav';
+          fav.textContent = '★';
+          fav.setAttribute('aria-label', 'Favorit');
+          row.append(fav);
         }
+        row.addEventListener('click', () => selectCamera(camera, { updateUrl: true }));
+        fragment.append(row);
+      });
+      els.cameraList.append(fragment);
+    }
 
-        function cameraKey(camera) {
-            return String(camera.path || camera.name || '');
+    function renderGrid(list) {
+      els.cameraGrid.replaceChildren();
+      els.gridHeading.textContent = favoritesOnly ? 'Kamera favorit' : 'Jelajahi kamera';
+      els.resultCount.textContent = `${list.length} hasil`;
+      if (!list.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = favoritesOnly ? 'Belum ada favorit yang cocok. Tekan ikon bintang pada kartu kamera untuk menyimpan lokasi.' : 'Tidak ada kamera yang cocok dengan pencarian.';
+        els.cameraGrid.append(empty);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      list.forEach(camera => {
+        const key = cameraKey(camera);
+        const card = document.createElement('article');
+        card.className = 'camera-card' + (key === selectedCameraKey ? ' selected' : '');
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `Tonton ${cameraName(camera)}`);
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb-wrap';
+        if (camera.source === 'dki' && camera.embedUrl) {
+          const preview = document.createElement('div');
+          preview.className = 'camera-placeholder';
+          preview.setAttribute('aria-label', 'Preview video dimuat saat kamera dipilih');
+          preview.textContent = '▶';
+          thumb.append(preview);
+        } else {
+          thumb.append(makeImage(camera, ''));
         }
+        const thumbLabel = document.createElement('span');
+        thumbLabel.className = 'thumb-label';
+        thumbLabel.textContent = camera.source === 'dki' ? 'DKI JAKARTA' : 'KOTA BEKASI';
+        thumb.append(thumbLabel);
+        const favoriteButton = document.createElement('button');
+        favoriteButton.type = 'button';
+        favoriteButton.className = 'card-favorite' + (favorites.has(key) ? ' is-favorite' : '');
+        favoriteButton.textContent = favorites.has(key) ? '★' : '☆';
+        favoriteButton.title = favorites.has(key) ? 'Hapus dari favorit' : 'Tambah ke favorit';
+        favoriteButton.setAttribute('aria-label', favoriteButton.title);
+        favoriteButton.addEventListener('click', event => toggleFavorite(camera, event));
+        thumb.append(favoriteButton);
 
-        function cameraName(camera) {
-            return String(camera.name || camera.path || 'CCTV tanpa nama')
-                .replace(/\\.m3u8$/i, '').replace(/[_-]+/g, ' ').replace(/\\s+/g, ' ').trim();
-        }
+        const body = document.createElement('div');
+        body.className = 'camera-card-body';
+        const heading = document.createElement('h4');
+        heading.textContent = cameraName(camera);
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+        const watch = document.createElement('span');
+        watch.className = 'watch-link';
+        watch.textContent = '▶ Tonton live';
+        const share = document.createElement('button');
+        share.type = 'button';
+        share.className = 'mini-share';
+        share.innerHTML = '<svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.7 2.3a.8.8 0 0 0-.84-.18L2.3 9.3a.8.8 0 0 0 .04 1.52l7.2 2.4 2.4 7.2a.8.8 0 0 0 1.52.04l7.18-18.56a.8.8 0 0 0-.94-1.6ZM12.2 18.1l-1.55-4.66 5.03-5.03-6.2 4.18-4.66-1.55 13.48-5.22-6.1 12.28Z"/></svg>';
+        share.title = 'Bagikan kamera';
+        share.setAttribute('aria-label', 'Bagikan kamera ' + cameraName(camera));
+        share.addEventListener('click', event => {
+          event.stopPropagation();
+          shareCamera(camera);
+        });
+        actions.append(watch, share);
+        body.append(heading, actions);
+        card.append(thumb, body);
+        card.addEventListener('click', () => selectCamera(camera, { updateUrl: true }));
+        card.addEventListener('keydown', event => {
+          if (event.target !== card) return;
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            selectCamera(camera, { updateUrl: true });
+          }
+        });
+        fragment.append(card);
+      });
+      els.cameraGrid.append(fragment);
+    }
 
-        function streamUrl(camera) {
-            const path = String(camera.path || '').trim();
-            if (!path || path.includes('..') || /^https?:/i.test(path)) return null;
-            return new URL(path, STREAM_BASE).href;
-        }
+    function renderCameras() {
+      const list = getFilteredCameras();
+      renderSidebar(list);
+      renderGrid(list);
+      renderMapMarkers(list);
+      updateFavoriteCount();
+      els.cameraCount.textContent = `${cameras.length} kamera terdaftar`;
+      if (selectedCameraKey) {
+        const selected = cameras.find(c => cameraKey(c) === selectedCameraKey);
+        if (selected) els.selectedLabel.textContent = cameraName(selected);
+      }
+    }
 
-        function safeImageUrl(value) {
-            if (typeof value !== 'string' || !value.trim()) return '';
-            try {
-                const url = new URL(value, location.href);
-                return url.protocol === 'https:' ? url.href : '';
-            } catch {return '';}
-        }
+    // Coordinates are deliberately limited to recognizable road/intersection areas.
+    // They are approximate area markers, not surveyed camera coordinates.
+    const LOCATION_POINTS = [
+      { match: /mayor oking/i, lat: -6.2386, lon: 106.9961, source: 'bekasi' },
+      { match: /ra kartini/i, lat: -6.2389, lon: 106.9922, source: 'bekasi' },
+      { match: /rawa tembaga/i, lat: -6.2350, lon: 107.0002, source: 'bekasi' },
+      { match: /kalimalang.*caman|perempatan caman/i, lat: -6.2640, lon: 106.9715, source: 'bekasi' },
+      { match: /siliwangi.*pasar segar/i, lat: -6.2580, lon: 107.0060, source: 'bekasi' },
+      { match: /siliwangi.*flyover cipendawa/i, lat: -6.2740, lon: 107.0065, source: 'bekasi' },
+      { match: /siliwangi/i, lat: -6.2630, lon: 107.0040, source: 'bekasi' },
+      { match: /gatot subroto/i, lat: -6.2280, lon: 106.8150, source: 'dki' },
+      { match: /gerbang pemuda/i, lat: -6.2180, lon: 106.8000, source: 'dki' },
+      { match: /letjen.*s.?parman|s.?parman/i, lat: -6.2020, lon: 106.7970, source: 'dki' },
+      { match: /mh thamrin|bundaran hi/i, lat: -6.1945, lon: 106.8230, source: 'dki' },
+      { match: /tanah abang/i, lat: -6.1860, lon: 106.8100, source: 'dki' },
+      { match: /bendungan hilir/i, lat: -6.2150, lon: 106.8170, source: 'dki' }
+    ];
 
-        function showToast(message) {
-            els.toast.textContent = message;
-            els.toast.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2600);
-        }
+    function cameraCoordinates(camera) {
+      const text = `${cameraName(camera)} ${camera.location || ''}`;
+      const match = LOCATION_POINTS.find(point => point.source === (camera.source || 'bekasi') && point.match.test(text));
+      return match ? { lat: match.lat, lon: match.lon, approximate: true } : null;
+    }
 
-        function setPlayerMessage(message, type = '') {
-            els.playerMessage.textContent = message;
-            els.playerMessage.classList.toggle('error', type === 'error');
-        }
+    function ensureMap() {
+      if (mapInstance || !window.L || !$('map')) return;
+      mapInstance = L.map('map', { zoomControl: true, preferCanvas: true }).setView([-6.245, 106.91], 10);
+      // Esri World Street Map: avoids OSM volunteer tile server's file:// policy block.
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri &mdash; Sources: Esri, HERE, Garmin, FAO, NOAA, USGS, OpenStreetMap contributors, and the GIS User Community'
+      }).addTo(mapInstance);
+    }
 
-        function setBusy(busy) {
-            els.refresh.disabled = busy;
-            els.refreshData.disabled = busy;
-            els.cameraCount.textContent = busy ? 'Memuat daftar kamera...' : `${cameras.length} kamera terdaftar`;
-        }
+    function renderMapMarkers(list) {
+      ensureMap();
+      if (!mapInstance) {
+        els.mapMarkerCount.textContent = 'Library peta belum berhasil dimuat; gunakan mode grid.';
+        return;
+      }
+      mapMarkers.forEach(marker => marker.remove());
+      mapMarkers = [];
+      let located = 0;
+      list.forEach(camera => {
+        const coords = cameraCoordinates(camera);
+        if (!coords) return;
+        located++;
+        const color = camera.source === 'dki' ? '#f59e0b' : '#3b82f6';
+        const icon = L.divIcon({ className: 'camera-map-marker', html: `<div style="width:25px;height:25px;border:2px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${color};box-shadow:0 2px 8px #0008"><span style="display:block;transform:rotate(45deg);text-align:center;line-height:21px;color:#fff;font-size:12px">●</span></div>`, iconSize: [25, 25], iconAnchor: [12, 24] });
+        const marker = L.marker([coords.lat, coords.lon], { icon }).addTo(mapInstance);
+        const popup = document.createElement('div');
+        const title = document.createElement('strong'); title.textContent = cameraName(camera);
+        const meta = document.createElement('div'); meta.textContent = `${camera.source === 'dki' ? 'DKI Jakarta' : 'Kota Bekasi'} · lokasi perkiraan`;
+        const button = document.createElement('button'); button.className = 'map-popup-button'; button.textContent = '▶ Buka kamera';
+        button.addEventListener('click', () => selectCamera(camera, { updateUrl: true }));
+        popup.append(title, meta, button);
+        marker.bindPopup(popup);
+        mapMarkers.push(marker);
+      });
+      els.mapMarkerCount.textContent = `${located} marker lokasi · kamera tanpa koordinat tetap tersedia di daftar`;
+      if (currentView === 'map') setTimeout(() => mapInstance && mapInstance.invalidateSize(), 80);
+    }
 
-        function getFilteredCameras() {
-            const query = els.search.value.trim().toLocaleLowerCase('id');
-            let list = cameras.filter(camera => cameraName(camera).toLocaleLowerCase('id').includes(query));
-            if (favoritesOnly) list = list.filter(camera => favorites.has(cameraKey(camera)));
-            if (els.sort.value === 'az') list.sort((a, b) => cameraName(a).localeCompare(cameraName(b), 'id'));
-            if (els.sort.value === 'za') list.sort((a, b) => cameraName(b).localeCompare(cameraName(a), 'id'));
-            return list;
-        }
+    function setView(view) {
+      currentView = view;
+      const mapMode = view === 'map';
+      els.mapSection.classList.toggle('hidden', !mapMode);
+      $('grid-heading').parentElement.classList.toggle('hidden', mapMode);
+      els.cameraGrid.classList.toggle('hidden', mapMode);
+      els.mapViewBtn.setAttribute('aria-pressed', String(mapMode));
+      els.gridViewBtn.setAttribute('aria-pressed', String(!mapMode));
+      if (mapInstance && mapMode) setTimeout(() => mapInstance.invalidateSize(), 100);
+    }
 
-        function makeImage(camera, className) {
-            const img = document.createElement('img');
-            img.className = className || '';
-            img.loading = 'lazy';
-            img.alt = `Pratinjau ${cameraName(camera)}`;
-            img.src = safeImageUrl(camera.pic) || '';
-            img.addEventListener('error', () => {
-                img.onerror = null;
-                img.removeAttribute('src');
-                img.alt = 'Thumbnail tidak tersedia';
-            }, {once: true});
-            return img;
-        }
+    function weatherLabel(code) {
+      if (code === 0) return ['Cerah', '☀️'];
+      if ([1,2,3].includes(code)) return ['Cerah berawan / mendung', '⛅'];
+      if ([45,48].includes(code)) return ['Berkabut', '🌫️'];
+      if ([51,53,55,56,57].includes(code)) return ['Gerimis', '🌦️'];
+      if ([61,63,65,66,67,80,81,82].includes(code)) return ['Hujan', '🌧️'];
+      if ([71,73,75,77,85,86].includes(code)) return ['Salju', '❄️'];
+      if ([95,96,99].includes(code)) return ['Badai petir', '⛈️'];
+      return ['Kondisi tidak diketahui', '🌡️'];
+    }
 
-        function toggleFavorite(camera, event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            const key = cameraKey(camera);
-            if (favorites.has(key)) {
-                favorites.delete(key);
-                showToast('Dihapus dari favorit');
-            } else {
-                favorites.add(key);
-                showToast('Ditambahkan ke favorit');
-            }
-            saveFavorites();
-            updateFavoriteCount();
-            renderCameras();
-        }
+    async function loadWeather(city, lat, lon, elementId) {
+      const el = $(elementId);
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&daily=precipitation_probability_max&timezone=Asia%2FJakarta&forecast_days=1`;
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const c = data.current;
+        const [label, icon] = weatherLabel(c.weather_code);
+        const rainChance = data.daily?.precipitation_probability_max?.[0];
+        el.replaceChildren();
+        const top = document.createElement('div'); top.className = 'weather-top';
+        const strong = document.createElement('strong'); strong.textContent = `Cuaca ${city}`;
+        const updated = document.createElement('span'); updated.textContent = 'Saat ini'; top.append(strong, updated);
+        const main = document.createElement('div'); main.className = 'weather-main';
+        const ico = document.createElement('span'); ico.className = 'weather-icon'; ico.textContent = icon;
+        const temp = document.createElement('span'); temp.className = 'weather-temp'; temp.textContent = `${Math.round(c.temperature_2m)}°C`;
+        const condition = document.createElement('span'); condition.className = 'weather-details'; condition.textContent = label; main.append(ico, temp, condition);
+        const details = document.createElement('div'); details.className = 'weather-details';
+        details.textContent = `Terasa ${Math.round(c.apparent_temperature)}°C · Kelembapan ${c.relative_humidity_2m}% · Angin ${Math.round(c.wind_speed_10m)} km/jam · Hujan ${rainChance ?? '—'}%`;
+        el.append(top, main, details);
+      } catch (error) {
+        el.innerHTML = `<div class="weather-top"><strong>Cuaca ${city}</strong><span>Belum tersedia</span></div><div class="weather-details">Data cuaca gagal dimuat. Periksa koneksi internet lalu refresh halaman.</div>`;
+      }
+    }
 
-        function updateFavoriteCount() {
-            els.favoriteCount.textContent = String(favorites.size);
-            els.favoritesFilter.setAttribute('aria-pressed', String(favoritesOnly));
-            els.allFilter.setAttribute('aria-pressed', String(!favoritesOnly));
-        }
+    async function loadCameras() {
+      setBusy(true);
+      els.lastUpdated.textContent = 'Memuat daftar kamera Bekasi dan DKI Jakarta...';
+      const previousSelection = selectedCameraKey;
+      const results = await Promise.allSettled([loadBekasiCameras(), loadDkiCameras()]);
+      const bekasi = results[0].status === 'fulfilled' ? results[0].value : [];
+      let dki = results[1].status === 'fulfilled' ? results[1].value : [];
+      if (!dki.length) {
+        dki = DKI_FALLBACK;
+        if (results[1].status === 'rejected') console.warn('Daftar DKI tidak dapat diambil; menggunakan 8 kamera awal yang diketahui.', results[1].reason);
+      }
+      cameras = [...bekasi, ...dki];
+      if (previousSelection && !cameras.some(c => cameraKey(c) === previousSelection)) {
+        selectedCameraKey = null;
+        stopPlayer();
+        resetPlayerPanel();
+      }
+      renderCameras();
+      const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      els.lastUpdated.textContent = `Bekasi ${bekasi.length} · DKI ${dki.length} · diperbarui ${now}`;
+      if (!bekasi.length && !dki.length) showToast('Sumber CCTV belum bisa dimuat. Coba refresh.');
+      else if (!bekasi.length) showToast('Data Bekasi gagal dimuat; CCTV DKI tetap ditampilkan.');
+      else if (results[1].status === 'rejected') showToast('API daftar DKI terhalang CORS; menampilkan 8 kamera DKI contoh.');
+      setBusy(false);
+      openCameraFromUrl();
+    }
 
-        function renderSidebar(list) {
-            els.cameraList.replaceChildren();
-            els.sidebarCount.textContent = `${list.length} kamera ditampilkan`;
-            if (!list.length) {
-                const empty = document.createElement('div');
-                empty.className = 'empty';
-                empty.textContent = favoritesOnly ? 'Belum ada kamera favorit yang cocok.' : 'Tidak ada kamera yang cocok dengan pencarian.';
-                els.cameraList.append(empty);
-                return;
-            }
+    async function loadBekasiCameras() {
+      const response = await fetch(DATA_URL, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Bekasi HTTP ${response.status}`);
+      const data = await response.json();
+      if (!Array.isArray(data)) throw new Error('Format JSON Bekasi bukan array kamera.');
+      return data.filter(item => item && typeof item.path === 'string' && item.path.trim()).map(item => ({ ...item, source: 'bekasi' }));
+    }
 
-            const fragment = document.createDocumentFragment();
-            list.forEach(camera => {
-                const key = cameraKey(camera);
-                const row = document.createElement('button');
-                row.type = 'button';
-                row.className = 'camera-row' + (key === selectedCameraKey ? ' active' : '');
-                row.setAttribute('aria-current', key === selectedCameraKey ? 'true' : 'false');
-                row.append(makeImage(camera, ''));
-                const info = document.createElement('span');
-                info.className = 'camera-row-info';
-                const name = document.createElement('span');
-                name.className = 'camera-row-name';
-                name.textContent = cameraName(camera);
-                const sub = document.createElement('span');
-                sub.className = 'camera-row-sub';
-                sub.textContent = 'Pilih untuk menonton';
-                info.append(name, sub);
-                row.append(info);
-                if (favorites.has(key)) {
-                    const fav = document.createElement('span');
-                    fav.className = 'camera-row-fav';
-                    fav.textContent = '★';
-                    fav.setAttribute('aria-label', 'Favorit');
-                    row.append(fav);
-                }
-                row.addEventListener('click', () => selectCamera(camera, {updateUrl: true}));
-                fragment.append(row);
-            });
-            els.cameraList.append(fragment);
-        }
+    async function loadDkiCameras() {
+      const all = [];
+      for (let page = 1; page <= DKI_PAGE_COUNT; page++) {
+        const url = new URL(DKI_DATA_URL);
+        url.searchParams.set('q', '');
+        url.searchParams.set('page', String(page));
+        const response = await fetch(url.href, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`DKI HTTP ${response.status}`);
+        const data = await response.json();
+        if (!data || typeof data.cards !== 'string') throw new Error('Format data DKI tidak dikenali.');
+        const doc = new DOMParser().parseFromString(data.cards, 'text/html');
+        doc.querySelectorAll('.card').forEach(card => {
+          const frame = card.querySelector('iframe[src]');
+          if (!frame) return;
+          const embedUrl = new URL(frame.getAttribute('src'), 'https://jakcctv.jakarta.go.id').href;
+          if (!/^https:\/\/dki-jkt\.balitower\.co\.id:7028\//i.test(embedUrl)) return;
+          const locationName = card.querySelector('.title')?.textContent?.trim() || 'CCTV DKI Jakarta';
+          const id = card.querySelector('.badge')?.textContent?.trim() || '';
+          const keyPath = embedUrl;
+          if (all.some(camera => camera.path === keyPath)) return;
+          all.push({ source: 'dki', location: locationName, id, name: `${locationName}${id ? ' · ' + id : ''}`, path: keyPath, embedUrl, pic: '' });
+        });
+        if (data.total && all.length >= Number(data.total)) break;
+      }
+      if (!all.length) throw new Error('Tidak ada kamera DKI ditemukan pada data.');
+      return all;
+    }
 
-        function renderGrid(list) {
-            els.cameraGrid.replaceChildren();
-            els.gridHeading.textContent = favoritesOnly ? 'Kamera favorit' : 'Jelajahi kamera';
-            els.resultCount.textContent = `${list.length} hasil`;
-            if (!list.length) {
-                const empty = document.createElement('div');
-                empty.className = 'empty';
-                empty.textContent = favoritesOnly ? 'Belum ada favorit yang cocok. Tekan ikon bintang pada kartu kamera untuk menyimpan lokasi.' : 'Tidak ada kamera yang cocok dengan pencarian.';
-                els.cameraGrid.append(empty);
-                return;
-            }
+    function stopPlayer() {
+      if (hlsInstance) {
+        hlsInstance.destroy();
+        hlsInstance = null;
+      }
+      els.player.pause();
+      els.player.removeAttribute('src');
+      els.player.load();
+      els.player.classList.add('hidden');
+      els.dkiFrame.src = 'about:blank';
+      els.dkiFrame.classList.add('hidden');
+      els.placeholder.classList.remove('hidden');
+      els.fullscreen.disabled = true;
+    }
 
-            const fragment = document.createDocumentFragment();
-            list.forEach(camera => {
-                const key = cameraKey(camera);
-                const card = document.createElement('article');
-                card.className = 'camera-card' + (key === selectedCameraKey ? ' selected' : '');
-                card.tabIndex = 0;
-                card.setAttribute('role', 'button');
-                card.setAttribute('aria-label', `Tonton ${cameraName(camera)}`);
-                const thumb = document.createElement('div');
-                thumb.className = 'thumb-wrap';
-                thumb.append(makeImage(camera, ''));
-                const thumbLabel = document.createElement('span');
-                thumbLabel.className = 'thumb-label';
-                thumbLabel.textContent = 'KAMERA CCTV';
-                thumb.append(thumbLabel);
-                const favoriteButton = document.createElement('button');
-                favoriteButton.type = 'button';
-                favoriteButton.className = 'card-favorite' + (favorites.has(key) ? ' is-favorite' : '');
-                favoriteButton.textContent = favorites.has(key) ? '★' : '☆';
-                favoriteButton.title = favorites.has(key) ? 'Hapus dari favorit' : 'Tambah ke favorit';
-                favoriteButton.setAttribute('aria-label', favoriteButton.title);
-                favoriteButton.addEventListener('click', event => toggleFavorite(camera, event));
-                thumb.append(favoriteButton);
+    function resetPlayerPanel() {
+      els.playerTitle.textContent = 'Belum ada kamera dipilih';
+      els.playerLocation.textContent = 'Pilih kartu kamera untuk mulai menonton';
+      els.selectedLabel.textContent = 'Pilih kamera dari daftar';
+      els.shareCurrent.disabled = true;
+      els.previous.disabled = true;
+      els.next.disabled = true;
+      setPlayerMessage('Stream belum dimulai. Status kamera tidak diasumsikan aktif hanya dari daftar sumber.');
+    }
 
-                const body = document.createElement('div');
-                body.className = 'camera-card-body';
-                const heading = document.createElement('h4');
-                heading.textContent = cameraName(camera);
-                const actions = document.createElement('div');
-                actions.className = 'card-actions';
-                const watch = document.createElement('span');
-                watch.className = 'watch-link';
-                watch.textContent = '▶ Tonton live';
-                const share = document.createElement('button');
-                share.type = 'button';
-                share.className = 'mini-share';
-                share.textContent = '↗';
-                share.title = 'Bagikan kamera';
-                share.setAttribute('aria-label', 'Bagikan kamera ' + cameraName(camera));
-                share.addEventListener('click', event => {
-                    event.stopPropagation();
-                    shareCamera(camera);
-                });
-                actions.append(watch, share);
-                body.append(heading, actions);
-                card.append(thumb, body);
-                card.addEventListener('click', () => selectCamera(camera, {updateUrl: true}));
-                card.addEventListener('keydown', event => {
-                    if (event.target !== card) return;
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        selectCamera(camera, {updateUrl: true});
-                    }
-                });
-                fragment.append(card);
-            });
-            els.cameraGrid.append(fragment);
-        }
+    function selectCamera(camera, options = {}) {
+      const url = streamUrl(camera);
+      if (!url) {
+        showToast('URL stream kamera tidak valid.');
+        return;
+      }
+      selectedCameraKey = cameraKey(camera);
+      els.playerTitle.textContent = cameraName(camera);
+      els.playerLocation.textContent = camera.source === 'dki' ? 'DKI Jakarta · embed resmi dari Balitower' : 'Kota Bekasi · sumber streaming eksternal';
+      els.selectedLabel.textContent = cameraName(camera);
+      els.shareCurrent.disabled = false;
+      els.placeholder.classList.add('hidden');
+      els.player.classList.remove('hidden');
+      els.fullscreen.disabled = false;
+      setPlayerMessage('Menghubungkan ke stream. Kamera belum dianggap aktif sampai pemutar berhasil menerima data.');
+      stopPlayer();
+      els.placeholder.classList.add('hidden');
+      els.player.classList.remove('hidden');
+      els.fullscreen.disabled = false;
+      els.shareCurrent.disabled = false;
+      const list = getFilteredCameras();
+      const index = list.findIndex(c => cameraKey(c) === selectedCameraKey);
+      els.previous.disabled = list.length < 2 || index <= 0;
+      els.next.disabled = list.length < 2 || index < 0 || index >= list.length - 1;
+      renderCameras();
 
-        function renderCameras() {
-            const list = getFilteredCameras();
-            renderSidebar(list);
-            renderGrid(list);
-            updateFavoriteCount();
-            els.cameraCount.textContent = `${cameras.length} kamera terdaftar`;
-            if (selectedCameraKey) {
-                const selected = cameras.find(c => cameraKey(c) === selectedCameraKey);
-                if (selected) els.selectedLabel.textContent = cameraName(selected);
-            }
-        }
+      if (options.updateUrl) {
+        const urlObj = new URL(location.href);
+        urlObj.searchParams.set('camera', cameraKey(camera));
+        history.replaceState(null, '', urlObj);
+      }
+      if (camera.source === 'dki') {
+        els.player.classList.add('hidden');
+        els.dkiFrame.classList.remove('hidden');
+        els.dkiFrame.src = url;
+        setPlayerMessage('Memuat embed CCTV DKI. Pemutaran dikelola oleh player resmi penyedia.');
+      } else {
+        startPlayer(url);
+      }
+      if (window.matchMedia('(max-width: 820px)').matches) {
+        $('watch-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
 
-        async function loadCameras() {
-            setBusy(true);
-            els.lastUpdated.textContent = 'Memuat daftar terbaru...';
-            try {
-                const response = await fetch(DATA_URL, {cache: 'no-store'});
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                if (!Array.isArray(data)) throw new Error('Format JSON bukan array kamera.');
-
-                const previousSelection = selectedCameraKey;
-                cameras = data.filter(item => item && typeof item.path === 'string' && item.path.trim());
-                if (previousSelection && !cameras.some(c => cameraKey(c) === previousSelection)) {
-                    selectedCameraKey = null;
-                    stopPlayer();
-                    resetPlayerPanel();
-                }
-                renderCameras();
-                els.lastUpdated.textContent = `Daftar diperbarui ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`;
-                if (!cameras.length) showToast('Sumber data belum mencantumkan kamera.');
-            } catch (error) {
-                els.lastUpdated.textContent = 'Gagal memperbarui daftar';
-                els.cameraGrid.replaceChildren();
-                els.cameraList.replaceChildren();
-                const message = document.createElement('div');
-                message.className = 'empty';
-                message.textContent = 'Daftar kamera gagal dimuat. Periksa koneksi atau izin CORS pada sumber data, lalu coba refresh lagi.';
-                els.cameraGrid.append(message);
-                els.cameraList.append(message.cloneNode(true));
-                els.cameraCount.textContent = 'Data tidak tersedia';
-                showToast(`Gagal memuat daftar: ${error.message}`);
-            } finally {
-                setBusy(false);
-            }
-        }
-
-        function stopPlayer() {
+    function startPlayer(url) {
+      setPlayerMessage('Menghubungkan ke stream CCTV...');
+      if (window.Hls && Hls.isSupported()) {
+        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
+        hlsInstance.loadSource(url);
+        hlsInstance.attachMedia(els.player);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+          setPlayerMessage('Stream berhasil dimuat. Status ini menunjukkan player menerima manifest, bukan jaminan stream akan selalu tersedia.');
+          els.player.play().catch(() => setPlayerMessage('Stream siap. Tekan tombol Play untuk memulai.'));
+        });
+        hlsInstance.on(Hls.Events.ERROR, (_event, data) => {
+          if (data && data.fatal) {
+            setPlayerMessage('Stream gagal diputar. Kamera mungkin sedang tidak tersedia atau server membatasi akses dari situs lain.', 'error');
             if (hlsInstance) {
-                hlsInstance.destroy();
-                hlsInstance = null;
+              hlsInstance.destroy();
+              hlsInstance = null;
             }
-            els.player.pause();
-            els.player.removeAttribute('src');
-            els.player.load();
-            els.player.classList.add('hidden');
-            els.placeholder.classList.remove('hidden');
-            els.fullscreen.disabled = true;
-        }
-
-        function resetPlayerPanel() {
-            els.playerTitle.textContent = 'Belum ada kamera dipilih';
-            els.playerLocation.textContent = 'Pilih kartu kamera untuk mulai menonton';
-            els.selectedLabel.textContent = 'Pilih kamera dari daftar';
-            els.shareCurrent.disabled = true;
-            els.previous.disabled = true;
-            els.next.disabled = true;
-            setPlayerMessage('Stream belum dimulai. Status kamera tidak diasumsikan aktif hanya dari daftar sumber.');
-        }
-
-        function selectCamera(camera, options = {}) {
-            const url = streamUrl(camera);
-            if (!url) {
-                showToast('URL stream kamera tidak valid.');
-                return;
-            }
-            selectedCameraKey = cameraKey(camera);
-            els.playerTitle.textContent = cameraName(camera);
-            els.playerLocation.textContent = 'Kota Bekasi · sumber streaming eksternal';
-            els.selectedLabel.textContent = cameraName(camera);
-            els.shareCurrent.disabled = false;
-            els.placeholder.classList.add('hidden');
-            els.player.classList.remove('hidden');
-            els.fullscreen.disabled = false;
-            setPlayerMessage('Menghubungkan ke stream. Kamera belum dianggap aktif sampai pemutar berhasil menerima data.');
-            stopPlayer();
-            els.placeholder.classList.add('hidden');
-            els.player.classList.remove('hidden');
-            els.fullscreen.disabled = false;
-            els.shareCurrent.disabled = false;
-            const list = getFilteredCameras();
-            const index = list.findIndex(c => cameraKey(c) === selectedCameraKey);
-            els.previous.disabled = list.length < 2 || index <= 0;
-            els.next.disabled = list.length < 2 || index < 0 || index >= list.length - 1;
-            renderCameras();
-
-            if (options.updateUrl) {
-                const urlObj = new URL(location.href);
-                urlObj.searchParams.set('camera', camera.path);
-                history.replaceState(null, '', urlObj);
-            }
-            startPlayer(url);
-            if (window.matchMedia('(max-width: 820px)').matches) {
-                $('watch-section').scrollIntoView({behavior: 'smooth', block: 'start'});
-            }
-        }
-
-        function startPlayer(url) {
-            setPlayerMessage('Menghubungkan ke stream CCTV...');
-            if (window.Hls && Hls.isSupported()) {
-                hlsInstance = new Hls({enableWorker: true, lowLatencyMode: true});
-                hlsInstance.loadSource(url);
-                hlsInstance.attachMedia(els.player);
-                hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-                    setPlayerMessage('Stream berhasil dimuat. Status ini menunjukkan player menerima manifest, bukan jaminan stream akan selalu tersedia.');
-                    els.player.play().catch(() => setPlayerMessage('Stream siap. Tekan tombol Play untuk memulai.'));
-                });
-                hlsInstance.on(Hls.Events.ERROR, (_event, data) => {
-                    if (data && data.fatal) {
-                        setPlayerMessage('Stream gagal diputar. Kamera mungkin sedang tidak tersedia atau server membatasi akses dari situs lain.', 'error');
-                        if (hlsInstance) {
-                            hlsInstance.destroy();
-                            hlsInstance = null;
-                        }
-                    }
-                });
-            } else if (els.player.canPlayType('application/vnd.apple.mpegurl')) {
-                els.player.src = url;
-                els.player.play().then(() => setPlayerMessage('Pemutaran dimulai.')).catch(() => setPlayerMessage('Tekan tombol Play untuk mencoba memutar stream.'));
-                els.player.addEventListener('error', () => setPlayerMessage('Stream gagal diputar. Kamera mungkin sedang tidak tersedia.', 'error'), {once: true});
-            } else {
-                setPlayerMessage('Browser ini tidak mendukung HLS. Coba Chrome, Edge, atau Safari versi terbaru.', 'error');
-            }
-        }
-
-        function navigateCamera(direction) {
-            const list = getFilteredCameras();
-            const index = list.findIndex(c => cameraKey(c) === selectedCameraKey);
-            const nextIndex = index + direction;
-            if (nextIndex >= 0 && nextIndex < list.length) selectCamera(list[nextIndex], {updateUrl: true});
-        }
-
-        async function shareCamera(camera) {
-            const url = new URL(location.href);
-            url.searchParams.set('camera', camera.path);
-            const shareUrl = url.href;
-            try {
-                if (navigator.share) {
-                    await navigator.share({title: `KangCCTV — ${cameraName(camera)}`, text: `Tonton CCTV ${cameraName(camera)} di Kota Bekasi`, url: shareUrl});
-                } else if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(shareUrl);
-                    showToast('Link kamera berhasil disalin.');
-                } else {
-                    window.prompt('Salin link kamera ini:', shareUrl);
-                }
-            } catch (error) {
-                if (error && error.name !== 'AbortError') showToast('Link belum bisa dibagikan dari browser ini.');
-            }
-        }
-
-        function requestFullscreen() {
-            const target = els.player;
-            if (target.requestFullscreen) target.requestFullscreen().catch(() => showToast('Fullscreen tidak tersedia di browser ini.'));
-            else if (target.webkitEnterFullscreen) target.webkitEnterFullscreen();
-            else showToast('Fullscreen tidak didukung browser ini.');
-        }
-
-        function openCameraFromUrl() {
-            const params = new URLSearchParams(location.search);
-            const path = params.get('camera');
-            if (!path) return;
-            const camera = cameras.find(c => c.path === path);
-            if (camera) selectCamera(camera, {updateUrl: false});
-        }
-
-        els.search.addEventListener('input', renderCameras);
-        els.clearSearch.addEventListener('click', () => {els.search.value = ''; renderCameras(); els.search.focus();});
-        els.allFilter.addEventListener('click', () => {favoritesOnly = false; renderCameras();});
-        els.favoritesFilter.addEventListener('click', () => {favoritesOnly = true; renderCameras();});
-        els.sort.addEventListener('change', renderCameras);
-        els.refresh.addEventListener('click', loadCameras);
-        els.refreshData.addEventListener('click', loadCameras);
-        els.previous.addEventListener('click', () => navigateCamera(-1));
-        els.next.addEventListener('click', () => navigateCamera(1));
-        els.fullscreen.addEventListener('click', requestFullscreen);
-        els.shareCurrent.addEventListener('click', () => {
-            const camera = cameras.find(c => cameraKey(c) === selectedCameraKey);
-            if (camera) shareCamera(camera);
+          }
         });
-        els.player.addEventListener('error', () => {
-            if (!hlsInstance) setPlayerMessage('Stream gagal diputar. Kamera mungkin sedang tidak tersedia.', 'error');
-        });
+      } else if (els.player.canPlayType('application/vnd.apple.mpegurl')) {
+        els.player.src = url;
+        els.player.play().then(() => setPlayerMessage('Pemutaran dimulai.')).catch(() => setPlayerMessage('Tekan tombol Play untuk mencoba memutar stream.'));
+        els.player.addEventListener('error', () => setPlayerMessage('Stream gagal diputar. Kamera mungkin sedang tidak tersedia.', 'error'), { once: true });
+      } else {
+        setPlayerMessage('Browser ini tidak mendukung HLS. Coba Chrome, Edge, atau Safari versi terbaru.', 'error');
+      }
+    }
 
-        loadCameras().then(openCameraFromUrl);
-    </script>
+    function navigateCamera(direction) {
+      const list = getFilteredCameras();
+      const index = list.findIndex(c => cameraKey(c) === selectedCameraKey);
+      const nextIndex = index + direction;
+      if (nextIndex >= 0 && nextIndex < list.length) selectCamera(list[nextIndex], { updateUrl: true });
+    }
+
+    async function shareCamera(camera) {
+      const url = new URL(location.href);
+      url.searchParams.set('camera', cameraKey(camera));
+      const shareUrl = url.href;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: `KangCCTV — ${cameraName(camera)}`, text: `Tonton CCTV ${cameraName(camera)} di KangCCTV`, url: shareUrl });
+        } else if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(shareUrl);
+          showToast('Link kamera berhasil disalin.');
+        } else {
+          window.prompt('Salin link kamera ini:', shareUrl);
+        }
+      } catch (error) {
+        if (error && error.name !== 'AbortError') showToast('Link belum bisa dibagikan dari browser ini.');
+      }
+    }
+
+    function requestFullscreen() {
+      const camera = cameras.find(c => cameraKey(c) === selectedCameraKey);
+      const target = camera && camera.source === 'dki' ? els.dkiFrame : els.player;
+      if (target.requestFullscreen) target.requestFullscreen().catch(() => showToast('Fullscreen tidak tersedia di browser ini.'));
+      else if (target.webkitEnterFullscreen) target.webkitEnterFullscreen();
+      else showToast('Fullscreen tidak didukung browser ini.');
+    }
+
+    function openCameraFromUrl() {
+      const params = new URLSearchParams(location.search);
+      const path = params.get('camera');
+      if (!path) return;
+      const camera = cameras.find(c => cameraKey(c) === path || c.path === path);
+      if (camera) selectCamera(camera, { updateUrl: false });
+    }
+
+    els.mapViewBtn.addEventListener('click', () => setView('map'));
+    els.gridViewBtn.addEventListener('click', () => setView('grid'));
+    els.search.addEventListener('input', renderCameras);
+    els.clearSearch.addEventListener('click', () => { els.search.value = ''; renderCameras(); els.search.focus(); });
+    els.allFilter.addEventListener('click', () => { favoritesOnly = false; renderCameras(); });
+    els.favoritesFilter.addEventListener('click', () => { favoritesOnly = true; renderCameras(); });
+    els.sort.addEventListener('change', renderCameras);
+    els.sourceFilter.addEventListener('change', renderCameras);
+    els.refresh.addEventListener('click', loadCameras);
+    els.refreshData.addEventListener('click', loadCameras);
+    els.previous.addEventListener('click', () => navigateCamera(-1));
+    els.next.addEventListener('click', () => navigateCamera(1));
+    els.fullscreen.addEventListener('click', requestFullscreen);
+    els.shareCurrent.addEventListener('click', () => {
+      const camera = cameras.find(c => cameraKey(c) === selectedCameraKey);
+      if (camera) shareCamera(camera);
+    });
+    els.player.addEventListener('error', () => {
+      if (!hlsInstance) setPlayerMessage('Stream gagal diputar. Kamera mungkin sedang tidak tersedia.', 'error');
+    });
+
+    setView('map');
+    loadWeather('Kota Bekasi', -6.2383, 106.9756, 'weather-bekasi');
+    loadWeather('DKI Jakarta', -6.2088, 106.8456, 'weather-jakarta');
+    loadCameras();
+  </script>
 </body>
-
 </html>
