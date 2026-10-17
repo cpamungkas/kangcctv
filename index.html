@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1120">
-  <title>KangCCTV — Pantau Jabodetabek</title>
+  <title>KangCCTV — Pantau Jabodetabek &amp; Solo</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
     :root {
@@ -86,7 +86,7 @@
     .panel-header h3 { margin: 0 0 5px; font-size: 1rem; line-height: 1.35; overflow-wrap: anywhere; }
     .panel-header p { margin: 0; color: var(--muted); font-size: .82rem; }
     .player-wrap { background: #030712; position: relative; }
-    #player, #dki-frame { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: 66vh; background: #030712; object-fit: contain; border: 0; }
+    #player, #embed-frame { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: 66vh; background: #030712; object-fit: contain; border: 0; }
     .player-placeholder {
       aspect-ratio: 16 / 9; display: grid; place-items: center; padding: 24px; text-align: center;
       background: radial-gradient(ellipse at center, #16243b, #030712 72%); color: var(--muted);
@@ -116,7 +116,7 @@
     .view-panel { border:1px solid var(--border); border-radius:16px; overflow:hidden; background:var(--panel); box-shadow:var(--shadow); }
     #map { width:100%; height:min(58vh,560px); min-height:340px; background:#172238; }
     .map-caption { padding:10px 14px; color:var(--muted); font-size:.8rem; border-top:1px solid var(--border); }
-    .weather-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 20px; }
+    .weather-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:14px 0 20px; }
     .weather-card { border:1px solid var(--border); border-radius:14px; background:linear-gradient(145deg,#14233b,#101827); padding:14px 16px; min-width:0; }
     .weather-top { display:flex; justify-content:space-between; gap:8px; align-items:center; color:var(--muted); font-size:.8rem; }
     .weather-main { display:flex; align-items:center; gap:12px; margin:8px 0; }
@@ -166,7 +166,7 @@
   </style>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flv.js@1.5.0/dist/flv.min.js"></script>
 </head>
 <body>
   <div class="shell">
@@ -174,7 +174,7 @@
       <div class="brand-mark" aria-hidden="true">📹</div>
       <div>
         <h1 class="brand-name">KangCCTV</h1>
-        <p class="eyebrow">LIVE CAMERA DIRECTORY · BEKASI, DKI JAKARTA, DEPOK & SURAKARTA</p>
+        <p class="eyebrow">LIVE CAMERA DIRECTORY · BEKASI, DKI JAKARTA, DEPOK &amp; SOLO</p>
       </div>
       <div class="topbar-spacer"></div>
       <button class="icon-button" id="refresh" type="button" title="Muat ulang daftar kamera" aria-label="Muat ulang daftar kamera">↻</button>
@@ -182,8 +182,8 @@
 
     <section class="hero">
       <div>
-        <h2>Pantau Jabodetabek<span style="color:var(--blue)">.</span></h2>
-        <p>Jelajahi CCTV jalan Bekasi, DKI Jakarta, Depok, dan Surakarta dalam satu dashboard. Pilih kamera untuk membuka live stream.</p>
+        <h2>Pantau Jabodetabek &amp; Solo<span style="color:var(--blue)">.</span></h2>
+        <p>Jelajahi CCTV jalan Bekasi, DKI Jakarta, Depok, dan Solo dalam satu dashboard. Pilih kamera untuk membuka live stream.</p>
       </div>
       <a class="source-link" href="https://www.bekasikota.go.id/cctv/" target="_blank" rel="noopener noreferrer">Situs CCTV resmi ↗</a>
     </section>
@@ -195,7 +195,7 @@
         <button id="clear-search" type="button" aria-label="Hapus pencarian" title="Hapus pencarian">×</button>
       </div>
       <button class="filter-button" id="all-filter" type="button" aria-pressed="true">Semua kamera</button>
-      <select id="source-filter" aria-label="Filter wilayah"><option value="all">Semua wilayah</option><option value="bekasi">Bekasi</option><option value="dki">DKI Jakarta</option><option value="depok">Depok</option><option value="solo">Surakarta</option></select>
+      <select id="source-filter" aria-label="Filter wilayah"><option value="all">Semua wilayah</option><option value="bekasi">Bekasi</option><option value="dki">DKI Jakarta</option><option value="depok">Depok</option><option value="solo">Solo (Surakarta)</option></select>
       <button class="filter-button" id="favorites-filter" type="button" aria-pressed="false">♡ Favorit <span id="favorite-count">0</span></button>
       <button class="secondary-button" id="refresh-data" type="button">↻ Refresh data</button>
     </section>
@@ -219,11 +219,13 @@
     <section class="weather-row" aria-label="Informasi cuaca">
       <article class="weather-card" id="weather-bekasi"><div class="weather-top"><strong>Cuaca Kota Bekasi</strong><span>Memuat…</span></div><div class="weather-details">Mengambil informasi cuaca…</div></article>
       <article class="weather-card" id="weather-jakarta"><div class="weather-top"><strong>Cuaca DKI Jakarta</strong><span>Memuat…</span></div><div class="weather-details">Mengambil informasi cuaca…</div></article>
+      <article class="weather-card" id="weather-depok"><div class="weather-top"><strong>Cuaca Kota Depok</strong><span>Memuat…</span></div><div class="weather-details">Mengambil informasi cuaca…</div></article>
+      <article class="weather-card" id="weather-solo"><div class="weather-top"><strong>Cuaca Kota Surakarta (Solo)</strong><span>Memuat…</span></div><div class="weather-details">Mengambil informasi cuaca…</div></article>
     </section>
     <section id="map-section" class="view-panel">
       <div id="map" role="application" aria-label="Peta lokasi kamera CCTV"></div>
-      <div class="map-legend"><span><i class="legend-dot" style="background:#3b82f6"></i>Bekasi</span><span><i class="legend-dot" style="background:#f59e0b"></i>DKI Jakarta</span><span><i class="legend-dot" style="background:#a78bfa"></i>Depok</span><span><i class="legend-dot" style="background:#34d399"></i>Surakarta</span><span id="map-marker-count">Menyiapkan marker…</span></div>
-      <div class="map-caption">Marker Depok memakai koordinat yang disertakan pada data portal; marker Bekasi dan DKI yang belum memiliki koordinat resmi tetap berupa titik area perkiraan.</div>
+      <div class="map-legend"><span><i class="legend-dot" style="background:#3b82f6"></i>Bekasi</span><span><i class="legend-dot" style="background:#f59e0b"></i>DKI Jakarta</span><span><i class="legend-dot" style="background:#a78bfa"></i>Depok</span><span><i class="legend-dot" style="background:#34d399"></i>Solo (Surakarta)</span><span id="map-marker-count">Menyiapkan marker…</span></div>
+      <div class="map-caption">Marker Depok dan Solo memakai koordinat yang disertakan pada data portal masing-masing; marker Bekasi dan DKI yang belum memiliki koordinat resmi tetap berupa titik area perkiraan.</div>
     </section>
 
     <section id="watch-section">
@@ -244,12 +246,12 @@
             <div class="player-placeholder" id="player-placeholder">
               <div class="placeholder-inner">
                 <div class="placeholder-icon">◉</div>
-                <strong>KangCCTV Jabodetabek</strong>
-                <span>Pilih kamera Bekasi atau DKI Jakarta untuk memulai live stream.</span>
+                <strong>KangCCTV Jabodetabek &amp; Solo</strong>
+                <span>Pilih kamera Bekasi, DKI Jakarta, Depok, atau Solo untuk memulai live stream.</span>
               </div>
             </div>
             <video id="player" class="hidden" controls playsinline preload="metadata"></video>
-            <iframe id="dki-frame" class="hidden" title="CCTV DKI Jakarta" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
+            <iframe id="embed-frame" class="hidden" title="Embed CCTV resmi penyedia" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
           </div>
           <div class="player-controls">
             <button class="secondary-button" id="previous-camera" type="button" disabled>← Sebelumnya</button>
@@ -284,7 +286,7 @@
     <footer>
       <div>KangCCTV adalah direktori independen, bukan situs resmi pemerintah.</div>
       <div>Data dan pemutaran kamera mengikuti ketersediaan sumber masing-masing. Kamera yang tercantum belum tentu sedang aktif.</div>
-      <div><a href="https://www.bekasikota.go.id/cctv/" target="_blank" rel="noopener noreferrer">CCTV resmi Pemkot Bekasi ↗</a> · <a href="https://jakcctv.jakarta.go.id/publik" target="_blank" rel="noopener noreferrer">CCTV Publik DKI Jakarta ↗</a></div>
+      <div><a href="https://www.bekasikota.go.id/cctv/" target="_blank" rel="noopener noreferrer">CCTV resmi Pemkot Bekasi ↗</a> · <a href="https://jakcctv.jakarta.go.id/publik" target="_blank" rel="noopener noreferrer">CCTV Publik DKI Jakarta ↗</a> · <a href="https://ccroom-dishub.surakarta.go.id/index.php/cctv" target="_blank" rel="noopener noreferrer">Pantau Lalin Dishub Surakarta ↗</a></div>
     </footer>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -297,6 +299,8 @@
     const DEPOK_CAMERAS = [{"source":"depok","name":"PASAR PUCUNG 1","location":"PASAR PUCUNG 1","ip":"20.22.80.2","exists":1,"lat":-6.4458071,"lon":106.8284587,"path":"https://dishub.depok.go.id/vi/2022802.m3u8","pic":""},{"source":"depok","name":"SP Sektor Melati 2","location":"SP Sektor Melati 2","ip":"20.22.80.5","exists":1,"lat":-6.44498,"lon":106.8295961,"path":"https://dishub.depok.go.id/vi/2022805.m3u8","pic":""},{"source":"depok","name":"SP PASAR PUCUNG","location":"SP PASAR PUCUNG","ip":"20.22.80.3","exists":1,"lat":-6.446229,"lon":106.828477,"path":"https://dishub.depok.go.id/vi/2022803.m3u8","pic":""},{"source":"depok","name":"SP SEKTOR MELATI","location":"SP SEKTOR MELATI","ip":"20.22.80.4","exists":1,"lat":-6.444863672519,"lon":106.829802722545,"path":"https://dishub.depok.go.id/vi/2022804.m3u8","pic":""},{"source":"depok","name":"SP BBM A","location":"SP BBM A","ip":"20.22.80.8","exists":1,"lat":-6.40650331854,"lon":106.852003421244,"path":"https://dishub.depok.go.id/vi/2022808.m3u8","pic":""},{"source":"depok","name":"SP BBM","location":"SP BBM","ip":"20.22.80.9","exists":0,"lat":-6.4067651,"lon":106.8521242,"path":"https://dishub.depok.go.id/vi/2022809.m3u8","pic":""},{"source":"depok","name":"SP PEKAPURAN 1","location":"SP PEKAPURAN 1","ip":"20.22.80.12","exists":1,"lat":-6.385272,"lon":106.867415,"path":"https://dishub.depok.go.id/vi/20228012.m3u8","pic":""},{"source":"depok","name":"SP JEMBATAN STINK","location":"SP JEMBATAN STINK","ip":"20.22.80.16","exists":1,"lat":-6.3981075,"lon":106.8109412,"path":"https://dishub.depok.go.id/vi/20228016.m3u8","pic":""},{"source":"depok","name":"SP 4 GANDUL","location":"SP 4 GANDUL","ip":"20.22.80.20","exists":1,"lat":-6.339843,"lon":106.793552,"path":"https://dishub.depok.go.id/vi/20228020.m3u8","pic":""},{"source":"depok","name":"SP 4 GANDUL","location":"SP 4 GANDUL","ip":"20.22.80.21","exists":1,"lat":-6.339861,"lon":106.793544,"path":"https://dishub.depok.go.id/vi/20228021.m3u8","pic":""},{"source":"depok","name":"SP KSU TOLE ISKANDAR 2","location":"SP KSU TOLE ISKANDAR 2","ip":"20.22.80.25","exists":1,"lat":-6.4042727,"lon":106.8385257,"path":"https://dishub.depok.go.id/vi/20228025.m3u8","pic":""},{"source":"depok","name":"SP KSU TOLE ISKANDAR","location":"SP KSU TOLE ISKANDAR","ip":"20.22.80.24","exists":1,"lat":-6.403959,"lon":106.838482,"path":"https://dishub.depok.go.id/vi/20228024.m3u8","pic":""},{"source":"depok","name":"SP HEX CIPAYUNG","location":"SP HEX CIPAYUNG","ip":"20.22.80.30","exists":0,"lat":-6.4414257,"lon":106.7976008,"path":"https://dishub.depok.go.id/vi/20228030.m3u8","pic":""},{"source":"depok","name":"UI USBI Arah Jakarta","location":"UI USBI Arah Jakarta","ip":"10.10.90.58","exists":1,"lat":-6.357624901454,"lon":106.832508894492,"path":"https://dishub.depok.go.id/vi/10109058.m3u8","pic":""},{"source":"depok","name":"UI UBSI Arah Margonda","location":"UI UBSI Arah Margonda","ip":"10.10.90.59","exists":1,"lat":-6.356993325454,"lon":106.832952314274,"path":"https://dishub.depok.go.id/vi/10109059.m3u8","pic":""},{"source":"depok","name":"Simpang GDC 1","location":"Simpang GDC 1","ip":"10.10.90.34","exists":1,"lat":-6.410266733128,"lon":106.816814240077,"path":"https://dishub.depok.go.id/vi/10109034.m3u8","pic":""},{"source":"depok","name":"Simpang GDC 2","location":"Simpang GDC 2","ip":"10.10.90.35","exists":1,"lat":-6.410657221182,"lon":106.816747368967,"path":"https://dishub.depok.go.id/vi/10109035.m3u8","pic":""},{"source":"depok","name":"Ir.Juanda Adikarya 1","location":"Ir.Juanda Adikarya 1","ip":"10.10.90.42","exists":1,"lat":-6.377986162439,"lon":106.834650753341,"path":"https://dishub.depok.go.id/vi/10109042.m3u8","pic":""},{"source":"depok","name":"Ir.Juanda Arah Saminten","location":"Ir.Juanda Arah Saminten","ip":"10.10.90.66","exists":0,"lat":-6.379292804291,"lon":106.849119907264,"path":"https://dishub.depok.go.id/vi/10109066.m3u8","pic":""},{"source":"depok","name":"JPO Detos-Margo City 1","location":"JPO Detos-Margo City 1","ip":"10.10.90.2","exists":1,"lat":-6.36914523457,"lon":106.833815278371,"path":"https://dishub.depok.go.id/vi/1010902.m3u8","pic":""},{"source":"depok","name":"JPO Detos-Margo City 2","location":"JPO Detos-Margo City 2","ip":"10.10.90.3","exists":1,"lat":-6.3692289,"lon":106.834037,"path":"https://dishub.depok.go.id/vi/1010903.m3u8","pic":""},{"source":"depok","name":"Jembatan Panus","location":"Jembatan Panus","ip":"10.10.90.18","exists":1,"lat":-6.40063471796,"lon":106.831728480813,"path":"https://dishub.depok.go.id/vi/10109018.m3u8","pic":""},{"source":"depok","name":"Dermaga Komunitas Ciliwung Depok","location":"Dermaga Komunitas Ciliwung Depok","ip":"10.30.23.131","exists":1,"lat":-6.411459039802,"lon":106.818632608165,"path":"https://dishub.depok.go.id/vi/103023131.m3u8","pic":""},{"source":"depok","name":"Pospol Turjagwali","location":"Pospol Turjagwali","ip":"10.30.27.3","exists":1,"lat":-6.376736199663,"lon":106.831856654083,"path":"https://dishub.depok.go.id/vi/1030273.m3u8","pic":""},{"source":"depok","name":"Taman Elok Duren Seribu","location":"Taman Elok Duren Seribu","ip":"10.30.18.60","exists":0,"lat":-6.426070894313,"lon":106.737031995662,"path":"https://dishub.depok.go.id/vi/10301860.m3u8","pic":""},{"source":"depok","name":"SP GANG NANGKA 1","location":"SP GANG NANGKA 1","ip":"20.22.80.10","exists":1,"lat":-6.398065,"lon":106.864835,"path":"https://dishub.depok.go.id/vi/20228010.m3u8","pic":""},{"source":"depok","name":"SP GANG NANGKA 2","location":"SP GANG NANGKA 2","ip":"20.22.80.11","exists":1,"lat":-6.3980454,"lon":106.8643434,"path":"https://dishub.depok.go.id/vi/20228011.m3u8","pic":""},{"source":"depok","name":"SP POLSEK SUKMAJAYA","location":"SP POLSEK SUKMAJAYA","ip":"20.22.80.51","exists":1,"lat":-6.405207,"lon":106.850148,"path":"https://dishub.depok.go.id/vi/20228051.m3u8","pic":""},{"source":"depok","name":"SP RADEN SALEH","location":"SP RADEN SALEH","ip":"20.22.80.52","exists":1,"lat":-6.404231,"lon":106.840778,"path":"https://dishub.depok.go.id/vi/20228052.m3u8","pic":""},{"source":"depok","name":"SP AL HUDA 1","location":"SP AL HUDA 1","ip":"20.22.80.53","exists":1,"lat":-6.403784000503,"lon":106.837209987844,"path":"https://dishub.depok.go.id/vi/20228053.m3u8","pic":""},{"source":"depok","name":"SP AL HUDA 2","location":"SP AL HUDA 2","ip":"20.22.80.54","exists":1,"lat":-6.4032702,"lon":106.8367584,"path":"https://dishub.depok.go.id/vi/20228054.m3u8","pic":""},{"source":"depok","name":"SP MARGO","location":"SP MARGO","ip":"20.22.80.60","exists":1,"lat":-6.372302,"lon":106.833061,"path":"https://dishub.depok.go.id/vi/20228060.m3u8","pic":""},{"source":"depok","name":"SP MARGO 2","location":"SP MARGO 2","ip":"20.22.80.61","exists":1,"lat":-6.374013,"lon":106.832464,"path":"https://dishub.depok.go.id/vi/20228061.m3u8","pic":""},{"source":"depok","name":"Terowongan Dewi Sartika","location":"Terowongan Dewi Sartika","ip":"20.22.80.64","exists":1,"lat":-6.39973,"lon":106.818343,"path":"https://dishub.depok.go.id/vi/20228064.m3u8","pic":""},{"source":"depok","name":"Terowongan Dewi Sartika 2","location":"Terowongan Dewi Sartika 2","ip":"20.22.80.65","exists":1,"lat":-6.3982527,"lon":106.819981,"path":"https://dishub.depok.go.id/vi/20228065.m3u8","pic":""},{"source":"depok","name":"SP JATIJAJAR","location":"SP JATIJAJAR","ip":"20.22.80.67","exists":1,"lat":-6.410334,"lon":106.861454,"path":"https://dishub.depok.go.id/vi/20228067.m3u8","pic":""},{"source":"depok","name":"SP JATIJAJAR 2","location":"SP JATIJAJAR 2","ip":"20.22.80.68","exists":1,"lat":-6.4101849,"lon":106.8605206,"path":"https://dishub.depok.go.id/vi/20228068.m3u8","pic":""},{"source":"depok","name":"UI UBSI Margonda","location":"UI UBSI Margonda","ip":"10.10.90.60","exists":1,"lat":-6.3580666,"lon":106.8327728,"path":"https://dishub.depok.go.id/vi/10109060.m3u8","pic":""},{"source":"depok","name":"Lingkar UI Arah Jakarta","location":"Lingkar UI Arah Jakarta","ip":"10.10.90.50","exists":1,"lat":-6.355011944807,"lon":106.83272589276,"path":"https://dishub.depok.go.id/vi/10109050.m3u8","pic":""},{"source":"depok","name":"JPO Ramayana 1","location":"JPO Ramayana 1","ip":"10.10.90.11","exists":1,"lat":-6.3917062,"lon":106.8250541,"path":"https://dishub.depok.go.id/vi/10109011.m3u8","pic":""},{"source":"depok","name":"Ir.Juanda Adikarya 2","location":"Ir.Juanda Adikarya 2","ip":"10.10.90.43","exists":1,"lat":-6.3783166,"lon":106.8351759,"path":"https://dishub.depok.go.id/vi/10109043.m3u8","pic":""},{"source":"depok","name":"JPO Ramayana 2","location":"JPO Ramayana 2","ip":"10.10.90.10","exists":0,"lat":-6.3917932,"lon":106.8245922,"path":"https://dishub.depok.go.id/vi/10109010.m3u8","pic":""},{"source":"depok","name":"Taman Pondok Sukmajaya","location":"Taman Pondok Sukmajaya","ip":"10.30.18.69","exists":1,"lat":-6.3725161,"lon":106.8494615,"path":"https://dishub.depok.go.id/vi/10301869.m3u8","pic":""},{"source":"depok","name":"Taman Jawa Beji","location":"Taman Jawa Beji","ip":"10.30.18.29","exists":1,"lat":-6.3847,"lon":106.8122,"path":"https://dishub.depok.go.id/vi/10301829.m3u8","pic":""},{"source":"depok","name":"Taman Tapos 1","location":"Taman Tapos 1","ip":"10.30.18.76","exists":1,"lat":-6.432147591723,"lon":106.886423738782,"path":"https://dishub.depok.go.id/vi/10301876.m3u8","pic":""},{"source":"depok","name":"Taman Tapos 2","location":"Taman Tapos 2","ip":"10.30.18.77","exists":1,"lat":-6.4321449,"lon":106.8862662,"path":"https://dishub.depok.go.id/vi/10301877.m3u8","pic":""},{"source":"depok","name":"Taman Beji Timur","location":"Taman Beji Timur","ip":"10.30.18.44","exists":1,"lat":-6.381805,"lon":106.822055,"path":"https://dishub.depok.go.id/vi/10301844.m3u8","pic":""},{"source":"depok","name":"SP AKSES UI 1","location":"SP AKSES UI 1","ip":"20.22.80.14","exists":0,"lat":-6.3548885,"lon":106.845941,"path":"https://dishub.depok.go.id/vi/20228014.m3u8","pic":""},{"source":"depok","name":"SP AKSES UI 2","location":"SP AKSES UI 2","ip":"20.22.80.15","exists":0,"lat":-6.354939,"lon":106.8465465,"path":"https://dishub.depok.go.id/vi/20228015.m3u8","pic":""},{"source":"depok","name":"SP Parung Bingung","location":"SP Parung Bingung","ip":"20.22.80.69","exists":1,"lat":-6.394687,"lon":106.772802,"path":"https://dishub.depok.go.id/vi/20228069.m3u8","pic":""},{"source":"depok","name":"SP PEKAPURAN 2","location":"SP PEKAPURAN 2","ip":"20.22.80.13","exists":1,"lat":-6.385598,"lon":106.867381,"path":"https://dishub.depok.go.id/vi/20228013.m3u8","pic":""},{"source":"depok","name":"SP JEMBATAN STINK","location":"SP JEMBATAN STINK","ip":"20.22.80.17","exists":1,"lat":-6.398655986827,"lon":106.810731700783,"path":"https://dishub.depok.go.id/vi/20228017.m3u8","pic":""},{"source":"depok","name":"SP WATES","location":"SP WATES","ip":"20.22.80.22","exists":0,"lat":-6.361128,"lon":106.74798,"path":"https://dishub.depok.go.id/vi/20228022.m3u8","pic":""},{"source":"depok","name":"SP WATES 2","location":"SP WATES 2","ip":"20.22.80.23","exists":0,"lat":-6.363887,"lon":106.746564,"path":"https://dishub.depok.go.id/vi/20228023.m3u8","pic":""},{"source":"depok","name":"SP KODIM","location":"SP KODIM","ip":"20.22.80.62","exists":0,"lat":-6.394615897385,"lon":106.794940161358,"path":"https://dishub.depok.go.id/vi/20228062.m3u8","pic":""},{"source":"depok","name":"SP Tugu Batu","location":"SP Tugu Batu","ip":"20.22.80.26","exists":1,"lat":-6.402829,"lon":106.770825,"path":"https://dishub.depok.go.id/vi/20228026.m3u8","pic":""},{"source":"depok","name":"SP TUGU BATU 2","location":"SP TUGU BATU 2","ip":"20.22.80.27","exists":1,"lat":-6.4033237,"lon":106.7698932,"path":"https://dishub.depok.go.id/vi/20228027.m3u8","pic":""},{"source":"depok","name":"SP PLN GDC","location":"SP PLN GDC","ip":"20.22.80.6","exists":0,"lat":-6.418441,"lon":106.826337,"path":"https://dishub.depok.go.id/vi/2022806.m3u8","pic":""},{"source":"depok","name":"SP PLN GDC 2","location":"SP PLN GDC 2","ip":"20.22.80.7","exists":0,"lat":-6.419253,"lon":106.827479,"path":"https://dishub.depok.go.id/vi/2022807.m3u8","pic":""},{"source":"depok","name":"SP PARUNG BINGUNG 2","location":"SP PARUNG BINGUNG 2","ip":"20.22.80.70","exists":1,"lat":-6.3944,"lon":106.7724,"path":"https://dishub.depok.go.id/vi/20228070.m3u8","pic":""},{"source":"depok","name":"Pesona Khayangan","location":"Pesona Khayangan","ip":"20.22.80.28","exists":1,"lat":-6.3827477,"lon":106.829991,"path":"https://dishub.depok.go.id/vi/20228028.m3u8","pic":""},{"source":"depok","name":"Pesona Khayangan 2","location":"Pesona Khayangan 2","ip":"20.22.80.29","exists":1,"lat":-6.382459,"lon":106.829999,"path":"https://dishub.depok.go.id/vi/20228029.m3u8","pic":""},{"source":"depok","name":"PJU BALAI KOTA","location":"PJU BALAI KOTA","ip":"20.22.80.63","exists":1,"lat":-6.394352,"lon":106.823068,"path":"https://dishub.depok.go.id/vi/20228063.m3u8","pic":""},{"source":"depok","name":"Lajur Kartini","location":"Lajur Kartini","ip":"20.22.80.56","exists":0,"lat":-6.404183,"lon":106.81907,"path":"https://dishub.depok.go.id/vi/20228056.m3u8","pic":""},{"source":"depok","name":"SP GDC","location":"SP GDC","ip":"20.22.80.57","exists":1,"lat":-6.410489012427,"lon":106.816621782822,"path":"https://dishub.depok.go.id/vi/20228057.m3u8","pic":""},{"source":"depok","name":"Pospol Turjagwali 2","location":"Pospol Turjagwali 2","ip":"10.30.27.4","exists":1,"lat":-6.3762313,"lon":106.8287898,"path":"https://dishub.depok.go.id/vi/1030274.m3u8","pic":""}];
     const DKI_DATA_URL = 'https://jakcctv.jakarta.go.id/publik/data';
     const DKI_PAGE_COUNT = 7;
+    const DEPOK_PORTAL_URL = 'https://dishub.depok.go.id/cctv';
+    const SOLO_DATA_URL = 'https://ccroom-dishub.surakarta.go.id/index.php/api/cctv';
     const DKI_FALLBACK = [
       ['JKP POLDA JPO JL. GATOT SUBROTO 7','CCTV-01','502045_JKP_POLDA_JPO-JL.-GATOT-SUBROTO-7_CCTV-01'],
       ['JKP POLDA JPO JL. GATOT SUBROTO 7','CCTV-02','502045_JKP_POLDA_JPO-JL.-GATOT-SUBROTO-7_CCTV-02'],
@@ -307,19 +311,24 @@
       ['JKP SATPOL PP JL. GERBANG PEMUDA C04','CCTV-01','502506_JKP_SATPOL-PP_JL.-GERBANG-PEMUDA-C04_CCTV-01'],
       ['JKP SATPOL PP JL. GERBANG PEMUDA C04','CCTV-02','502506_JKP_SATPOL-PP_JL.-GERBANG-PEMUDA-C04_CCTV-02']
     ].map(([location, id, slug]) => ({ source: 'dki', location, id, name: `${location} · ${id}`, path: `https://dki-jkt.balitower.co.id:7028/${slug}/embed.html`, embedUrl: `https://dki-jkt.balitower.co.id:7028/${slug}/embed.html`, pic: '' }));
-    const SOLO_PROXY_BASE = 'https://kangcctv-solo-proxy.necha10-02.workers.dev/solo/';
-    const SOLO_CAMERAS = [
-      { source: 'solo', name: 'Balapan', location: 'Simpang Balapan, Surakarta', path: 'Balapan01.flv', lat: -7.5582, lon: 110.8217, pic: '' },
-      { source: 'solo', name: 'Gladag', location: 'Kawasan Gladag, Surakarta', path: 'Gladag.flv', lat: -7.5698, lon: 110.8282, pic: '' }
-    ];
     const FAVORITES_KEY = 'kangcctv:favorites:v1';
+
+    // Per-source presentation metadata. Adding a region only requires one entry here
+    // plus its loader in loadCameras().
+    const SOURCES = {
+      bekasi: { place: 'Kota Bekasi', badge: 'KOTA BEKASI', list: 'Bekasi · HLS', color: '#3b82f6', detail: 'Kota Bekasi · sumber streaming eksternal' },
+      dki: { place: 'DKI Jakarta', badge: 'DKI JAKARTA', list: 'DKI Jakarta · embed resmi', color: '#f59e0b', detail: 'DKI Jakarta · embed resmi dari Balitower' },
+      depok: { place: 'Kota Depok', badge: 'KOTA DEPOK', list: 'Depok · HLS native', color: '#a78bfa', detail: 'Kota Depok · HLS langsung dari server Dishub Depok' },
+      solo: { place: 'Kota Surakarta', badge: 'SOLO (SURAKARTA)', list: 'Solo · FLV', color: '#34d399', detail: 'Kota Surakarta (Solo) · FLV dari Pantau Lalin Dishub Surakarta' }
+    };
+    const sourceInfo = camera => SOURCES[camera.source] || SOURCES.bekasi;
 
     const $ = id => document.getElementById(id);
     const els = {
       search: $('search'), clearSearch: $('clear-search'), refresh: $('refresh'), refreshData: $('refresh-data'),
       allFilter: $('all-filter'), favoritesFilter: $('favorites-filter'), favoriteCount: $('favorite-count'), sourceFilter: $('source-filter'),
       cameraCount: $('camera-count'), lastUpdated: $('last-updated'), sort: $('sort'),
-      playerTitle: $('player-title'), playerLocation: $('player-location'), player: $('player'), dkiFrame: $('dki-frame'),
+      playerTitle: $('player-title'), playerLocation: $('player-location'), player: $('player'), embedFrame: $('embed-frame'),
       placeholder: $('player-placeholder'), playerMessage: $('player-message'), shareCurrent: $('share-current'),
       previous: $('previous-camera'), next: $('next-camera'), fullscreen: $('fullscreen'),
       selectedLabel: $('selected-label'), cameraList: $('camera-list'), sidebarCount: $('sidebar-count'),
@@ -330,12 +339,25 @@
     let cameras = [];
     let selectedCameraKey = null;
     let hlsInstance = null;
+    const FLV_MAX_ATTEMPTS = 3;
+    const FLV_ATTEMPT_TIMEOUT = 12000;
+    const FLV_RETRY_DELAY = 1000;
     let flvInstance = null;
+    let flvConnectTimer = null;
+    let flvCurrentUrl = null;
+    let flvAttempt = 0;
+    let flvMediaError = null;
+    const DEPOK_MAX_ATTEMPTS = 3;
+    const DEPOK_ATTEMPT_TIMEOUT = 15000;
+    let depokCurrentUrl = null;
+    let depokAttempt = 0;
+    let depokCheckTimer = null;
     let favorites = readFavorites();
     let favoritesOnly = false;
     let toastTimer = null;
     let mapInstance = null;
     let mapMarkers = [];
+    let lastMapFitFilter = null;
     let currentView = 'map';
 
     function readFavorites() {
@@ -366,8 +388,7 @@
 
     function streamUrl(camera) {
       if (camera.source === 'dki') return camera.embedUrl || camera.path || null;
-      if (camera.source === 'depok') return camera.path || null;
-      if (camera.source === 'solo') return SOLO_PROXY_BASE + encodeURIComponent(camera.path || '');
+      if (camera.source === 'depok' || camera.source === 'solo') return String(camera.path || '').trim() || null;
       const path = String(camera.path || '').trim();
       if (!path || path.includes('..') || /^https?:/i.test(path)) return null;
       return new URL(path, STREAM_BASE).href;
@@ -482,7 +503,7 @@
         name.textContent = cameraName(camera);
         const sub = document.createElement('span');
         sub.className = 'camera-row-sub';
-        sub.textContent = camera.source === 'dki' ? 'DKI Jakarta · embed resmi' : camera.source === 'depok' ? 'Depok · HLS' : camera.source === 'solo' ? 'Surakarta · FLV' : 'Bekasi · HLS';
+        sub.textContent = sourceInfo(camera).list;
         info.append(name, sub);
         row.append(info);
         if (favorites.has(key)) {
@@ -531,7 +552,7 @@
         }
         const thumbLabel = document.createElement('span');
         thumbLabel.className = 'thumb-label';
-        thumbLabel.textContent = camera.source === 'dki' ? 'DKI JAKARTA' : camera.source === 'depok' ? 'KOTA DEPOK' : camera.source === 'solo' ? 'SURAKARTA' : 'KOTA BEKASI';
+        thumbLabel.textContent = sourceInfo(camera).badge;
         thumb.append(thumbLabel);
         const favoriteButton = document.createElement('button');
         favoriteButton.type = 'button';
@@ -605,11 +626,85 @@
       { match: /letjen.*s.?parman|s.?parman/i, lat: -6.2020, lon: 106.7970, source: 'dki' },
       { match: /mh thamrin|bundaran hi/i, lat: -6.1945, lon: 106.8230, source: 'dki' },
       { match: /tanah abang/i, lat: -6.1860, lon: 106.8100, source: 'dki' },
-      { match: /bendungan hilir/i, lat: -6.2150, lon: 106.8170, source: 'dki' }
+      { match: /bendungan hilir/i, lat: -6.2150, lon: 106.8170, source: 'dki' },
+      // Solo: the Dishub Surakarta feed only publishes coordinates for a few cameras,
+      // so the rest are matched to the nearest recognizable area. Order matters —
+      // put the more specific pattern first when names overlap.
+      { match: /jembatan mojo/i, lat: -7.5894, lon: 110.8403, source: 'solo' },
+      { match: /mojosongo/i, lat: -7.5435, lon: 110.8419, source: 'solo' },
+      { match: /jembatan tirtonadi/i, lat: -7.5510, lon: 110.8220, source: 'solo' },
+      { match: /tirtonadi/i, lat: -7.5529, lon: 110.8208, source: 'solo' },
+      { match: /pengadilan/i, lat: -7.5673, lon: 110.8144, source: 'solo' },
+      { match: /sriwedari/i, lat: -7.5700, lon: 110.8119, source: 'solo' },
+      { match: /kelurahan sumber/i, lat: -7.5467, lon: 110.8034, source: 'solo' },
+      { match: /sate sumber/i, lat: -7.5467, lon: 110.8034, source: 'solo' },
+      { match: /sraten/i, lat: -7.5814, lon: 110.8179, source: 'solo' },
+      { match: /juanda/i, lat: -7.5705, lon: 110.8468, source: 'solo' },
+      { match: /mujahidin/i, lat: -7.5412, lon: 110.8080, source: 'solo' },
+      { match: /mlipahan/i, lat: -7.5695, lon: 110.8425, source: 'solo' },
+      { match: /pasar beling/i, lat: -7.5633, lon: 110.8147, source: 'solo' },
+      { match: /farokah/i, lat: -7.5591, lon: 110.7857, source: 'solo' },
+      { match: /brimob/i, lat: -7.6182, lon: 110.8164, source: 'solo' },
+      { match: /pucangsawit/i, lat: -7.5687, lon: 110.8536, source: 'solo' },
+      { match: /balai ?kota/i, lat: -7.5694, lon: 110.8296, source: 'solo' },
+      { match: /masjid agung/i, lat: -7.5744, lon: 110.8266, source: 'solo' },
+      { match: /loji gandrung/i, lat: -7.5670, lon: 110.8095, source: 'solo' },
+      { match: /pasar gede/i, lat: -7.5694, lon: 110.8316, source: 'solo' },
+      { match: /pasar klewer/i, lat: -7.5755, lon: 110.8265, source: 'solo' },
+      { match: /pasar kliwon/i, lat: -7.5755, lon: 110.8321, source: 'solo' },
+      { match: /pasar kembang/i, lat: -7.5723, lon: 110.8167, source: 'solo' },
+      { match: /pasar legi/i, lat: -7.5619, lon: 110.8253, source: 'solo' },
+      { match: /pasar nusukan/i, lat: -7.5465, lon: 110.8207, source: 'solo' },
+      { match: /pasar nongko/i, lat: -7.5584, lon: 110.8148, source: 'solo' },
+      { match: /pasar pon/i, lat: -7.5702, lon: 110.8219, source: 'solo' },
+      { match: /gladag|gladak/i, lat: -7.5697, lon: 110.8317, source: 'solo' },
+      { match: /bundaran baron|baron/i, lat: -7.5716, lon: 110.8102, source: 'solo' },
+      { match: /joglo/i, lat: -7.5405, lon: 110.8209, source: 'solo' },
+      { match: /tipes/i, lat: -7.5782, lon: 110.8098, source: 'solo' },
+      { match: /balapan/i, lat: -7.5572, lon: 110.8209, source: 'solo' },
+      { match: /purwosari/i, lat: -7.5615, lon: 110.7950, source: 'solo' },
+      { match: /manahan/i, lat: -7.5545, lon: 110.8089, source: 'solo' },
+      { match: /uns/i, lat: -7.5595, lon: 110.8569, source: 'solo' },
+      { match: /jurug/i, lat: -7.5660, lon: 110.8615, source: 'solo' },
+      { match: /sekarpace/i, lat: -7.5614, lon: 110.8492, source: 'solo' },
+      { match: /mipitan/i, lat: -7.5545, lon: 110.8577, source: 'solo' },
+      { match: /cembengan/i, lat: -7.5577, lon: 110.8476, source: 'solo' },
+      { match: /kandang sapi/i, lat: -7.5562, lon: 110.8385, source: 'solo' },
+      { match: /sangkrah/i, lat: -7.5757, lon: 110.8363, source: 'solo' },
+      { match: /semanggi/i, lat: -7.5835, lon: 110.8384, source: 'solo' },
+      { match: /baturono/i, lat: -7.5846, lon: 110.8293, source: 'solo' },
+      { match: /widuran/i, lat: -7.5657, lon: 110.8310, source: 'solo' },
+      { match: /warung pelem/i, lat: -7.5672, lon: 110.8326, source: 'solo' },
+      { match: /ketandan/i, lat: -7.5700, lon: 110.8327, source: 'solo' },
+      { match: /gemblegan/i, lat: -7.5818, lon: 110.8205, source: 'solo' },
+      { match: /dawung/i, lat: -7.5878, lon: 110.8183, source: 'solo' },
+      { match: /singosaren/i, lat: -7.5734, lon: 110.8208, source: 'solo' },
+      { match: /nonongan/i, lat: -7.5709, lon: 110.8244, source: 'solo' },
+      { match: /ngapeman/i, lat: -7.5690, lon: 110.8173, source: 'solo' },
+      { match: /timuran/i, lat: -7.5668, lon: 110.8177, source: 'solo' },
+      { match: /kawatan/i, lat: -7.5760, lon: 110.8156, source: 'solo' },
+      { match: /gendengan/i, lat: -7.5650, lon: 110.8063, source: 'solo' },
+      { match: /gilingan/i, lat: -7.5542, lon: 110.8281, source: 'solo' },
+      { match: /cengklik/i, lat: -7.5489, lon: 110.8293, source: 'solo' },
+      { match: /genengan/i, lat: -7.5425, lon: 110.8354, source: 'solo' },
+      { match: /banjarsari/i, lat: -7.5422, lon: 110.8104, source: 'solo' },
+      { match: /komplang/i, lat: -7.5444, lon: 110.8106, source: 'solo' },
+      { match: /klodran/i, lat: -7.5373, lon: 110.8032, source: 'solo' },
+      { match: /tugu wisnu|wisnu/i, lat: -7.5540, lon: 110.7993, source: 'solo' },
+      { match: /kerten/i, lat: -7.5570, lon: 110.7942, source: 'solo' },
+      { match: /ursulin/i, lat: -7.5529, lon: 110.7957, source: 'solo' },
+      { match: /fajar indah/i, lat: -7.5482, lon: 110.7906, source: 'solo' },
+      { match: /kleco/i, lat: -7.5573, lon: 110.7793, source: 'solo' },
+      { match: /jongke/i, lat: -7.5684, lon: 110.7908, source: 'solo' },
+      { match: /kabangan/i, lat: -7.5694, lon: 110.7970, source: 'solo' },
+      { match: /pajang/i, lat: -7.5701, lon: 110.7852, source: 'solo' },
+      { match: /dprd/i, lat: -7.5489, lon: 110.7827, source: 'solo' },
+      { match: /pgs|pusat grosir solo/i, lat: -7.5730, lon: 110.8309, source: 'solo' }
     ];
 
     function cameraCoordinates(camera) {
-      if (camera.source === 'depok' && Number.isFinite(camera.lat) && Number.isFinite(camera.lon)) {
+      // Sources that publish camera coordinates (Depok, Solo) use them as exact markers.
+      if (Number.isFinite(camera.lat) && Number.isFinite(camera.lon)) {
         return { lat: camera.lat, lon: camera.lon, approximate: false };
       }
       const text = `${cameraName(camera)} ${camera.location || ''}`;
@@ -652,7 +747,7 @@
       let locatedCameras = 0;
       groups.forEach(group => {
         locatedCameras += group.cameras.length;
-        const color = group.source === 'dki' ? '#f59e0b' : group.source === 'depok' ? '#a78bfa' : '#3b82f6';
+        const color = sourceInfo(group).color;
         const count = group.cameras.length;
         const icon = L.divIcon({
           className: 'camera-map-marker',
@@ -664,7 +759,7 @@
         const popup = document.createElement('div');
         popup.style.minWidth = '190px';
         const title = document.createElement('strong');
-        title.textContent = `${group.source === 'dki' ? 'DKI Jakarta' : group.source === 'depok' ? 'Kota Depok' : 'Kota Bekasi'} · ${count} kamera`;
+        title.textContent = `${sourceInfo(group).place} · ${count} kamera`;
         popup.append(title);
 
         group.cameras.forEach(camera => {
@@ -682,7 +777,7 @@
         });
 
         const note = document.createElement('div');
-        note.textContent = group.source === 'depok' ? 'Koordinat berasal dari data pada portal CCTV Depok.' : 'Titik area perkiraan, bukan koordinat kamera presisi.';
+        note.textContent = group.coords.approximate ? 'Titik area perkiraan, bukan koordinat kamera presisi.' : 'Koordinat berasal dari data pada portal CCTV resmi daerah.';
         note.style.cssText = 'font-size:11px;color:#64748b;margin-top:8px';
         popup.append(note);
         marker.bindPopup(popup);
@@ -690,6 +785,13 @@
       });
 
       els.mapMarkerCount.textContent = `${locatedCameras} kamera pada ${groups.size} titik area · titik perkiraan; kamera tanpa titik tetap tersedia di daftar`;
+      // A region filter narrows the map to one city; Solo sits ~470 km east of Jabodetabek,
+      // so fit once per region selection instead of leaving the view on the default frame.
+      const filterValue = els.sourceFilter.value;
+      if (mapMarkers.length && filterValue !== 'all' && filterValue !== lastMapFitFilter) {
+        mapInstance.fitBounds(mapMarkers.map(marker => marker.getLatLng()), { padding: [30, 30], maxZoom: 14 });
+      }
+      lastMapFitFilter = filterValue;
       if (currentView === 'map') setTimeout(() => mapInstance && mapInstance.invalidateSize(), 80);
     }
 
@@ -743,17 +845,18 @@
 
     async function loadCameras() {
       setBusy(true);
-      els.lastUpdated.textContent = 'Memuat daftar kamera Bekasi dan DKI Jakarta...';
+      els.lastUpdated.textContent = 'Memuat daftar kamera Bekasi, DKI Jakarta, Depok, dan Solo...';
       const previousSelection = selectedCameraKey;
-      const results = await Promise.allSettled([loadBekasiCameras(), loadDkiCameras()]);
+      const results = await Promise.allSettled([loadBekasiCameras(), loadDkiCameras(), loadSoloCameras()]);
       const bekasi = results[0].status === 'fulfilled' ? results[0].value : [];
       let dki = results[1].status === 'fulfilled' ? results[1].value : [];
       const depok = DEPOK_CAMERAS.map(camera => ({ ...camera, source: 'depok' }));
+      const solo = results[2].status === 'fulfilled' ? results[2].value : [];
       if (!dki.length) {
         dki = DKI_FALLBACK;
         if (results[1].status === 'rejected') console.warn('Daftar DKI tidak dapat diambil; menggunakan 8 kamera awal yang diketahui.', results[1].reason);
       }
-      const solo = SOLO_CAMERAS.map(camera => ({ ...camera, source: 'solo' }));
+      if (results[2].status === 'rejected') console.warn('Daftar Solo tidak dapat diambil.', results[2].reason);
       cameras = [...bekasi, ...dki, ...depok, ...solo];
       if (previousSelection && !cameras.some(c => cameraKey(c) === previousSelection)) {
         selectedCameraKey = null;
@@ -762,10 +865,11 @@
       }
       renderCameras();
       const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-      els.lastUpdated.textContent = `Bekasi ${bekasi.length} · DKI ${dki.length} · Depok ${depok.length} · Surakarta ${solo.length} · diperbarui ${now}`;
-      if (!bekasi.length && !dki.length) showToast('Sumber CCTV belum bisa dimuat. Coba refresh.');
-      else if (!bekasi.length) showToast('Data Bekasi gagal dimuat; CCTV DKI tetap ditampilkan.');
+      els.lastUpdated.textContent = `Bekasi ${bekasi.length} · DKI ${dki.length} · Depok ${depok.length} · Solo ${solo.length} · diperbarui ${now}`;
+      if (!bekasi.length && !dki.length && !solo.length) showToast('Sumber CCTV belum bisa dimuat. Coba refresh.');
+      else if (!bekasi.length) showToast('Data Bekasi gagal dimuat; wilayah lain tetap ditampilkan.');
       else if (results[1].status === 'rejected') showToast('API daftar DKI terhalang CORS; menampilkan 8 kamera DKI contoh.');
+      else if (results[2].status === 'rejected') showToast('Daftar kamera Solo (Dishub Surakarta) gagal dimuat.');
       setBusy(false);
       openCameraFromUrl();
     }
@@ -806,21 +910,50 @@
       return all;
     }
 
+    async function loadSoloCameras() {
+      const response = await fetch(SOLO_DATA_URL, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Solo HTTP ${response.status}`);
+      const payload = await response.json();
+      const list = Array.isArray(payload) ? payload : payload && payload.data;
+      if (!Array.isArray(list)) throw new Error('Format data Solo bukan daftar kamera.');
+      const cameras = list
+        .filter(item => item && typeof item.stream_url === 'string' && item.stream_url.trim())
+        .map(item => {
+          const name = String(item.nama || 'CCTV Solo').trim();
+          // latitude/longitude are null for most Solo cameras; keep null so the map
+          // falls back to approximate area markers instead of using 0,0.
+          return {
+            source: 'solo',
+            id: item.id,
+            location: name,
+            name,
+            path: item.stream_url.trim(),
+            lat: item.latitude === null || item.latitude === undefined ? null : Number(item.latitude),
+            lon: item.longitude === null || item.longitude === undefined ? null : Number(item.longitude),
+            pic: ''
+          };
+        });
+      if (!cameras.length) throw new Error('Tidak ada kamera Solo ditemukan pada data.');
+      return cameras;
+    }
+
     function stopPlayer() {
+      stopFlvPlayer();
       if (hlsInstance) {
         hlsInstance.destroy();
         hlsInstance = null;
       }
-      if (flvInstance) {
-        try { flvInstance.pause(); flvInstance.unload(); flvInstance.detachMediaElement(); flvInstance.destroy(); } catch (error) { console.warn('FLV cleanup:', error); }
-        flvInstance = null;
-      }
       els.player.pause();
+      clearDepokCheckTimer();
+      els.player.removeEventListener('error', handleDepokError);
+      els.player.removeEventListener('playing', handleDepokPlaying);
+      depokCurrentUrl = null;
+      depokAttempt = 0;
       els.player.removeAttribute('src');
       els.player.load();
       els.player.classList.add('hidden');
-      els.dkiFrame.src = 'about:blank';
-      els.dkiFrame.classList.add('hidden');
+      els.embedFrame.src = 'about:blank';
+      els.embedFrame.classList.add('hidden');
       els.placeholder.classList.remove('hidden');
       els.fullscreen.disabled = true;
     }
@@ -843,7 +976,7 @@
       }
       selectedCameraKey = cameraKey(camera);
       els.playerTitle.textContent = cameraName(camera);
-      els.playerLocation.textContent = camera.source === 'dki' ? 'DKI Jakarta · embed resmi dari Balitower' : camera.source === 'depok' ? 'Kota Depok · HLS dari portal CCTV Dishub Depok' : camera.source === 'solo' ? `${camera.location || camera.name} · FLV melalui KangCCTV Solo Proxy` : 'Kota Bekasi · sumber streaming eksternal';
+      els.playerLocation.textContent = sourceInfo(camera).detail;
       els.selectedLabel.textContent = cameraName(camera);
       els.shareCurrent.disabled = false;
       els.placeholder.classList.add('hidden');
@@ -867,10 +1000,9 @@
         history.replaceState(null, '', urlObj);
       }
       if (camera.source === 'dki') {
-        els.player.classList.add('hidden');
-        els.dkiFrame.classList.remove('hidden');
-        els.dkiFrame.src = url;
-        setPlayerMessage('Memuat embed CCTV DKI. Pemutaran dikelola oleh player resmi penyedia.');
+        startEmbedPlayer(url, 'Memuat embed CCTV DKI. Pemutaran dikelola oleh player resmi penyedia.');
+      } else if (camera.source === 'depok') {
+        startDepokPlayer(url);
       } else if (camera.source === 'solo') {
         startFlvPlayer(url);
       } else {
@@ -909,27 +1041,178 @@
       }
     }
 
+    // Server Dishub Depok hanya mengizinkan origin portalnya sendiri
+    // (Access-Control-Allow-Origin: https://dsw.depok.go.id), sehingga hls.js dan fetch dari origin
+    // lain ditolak browser. Elemen video tanpa atribut crossorigin tidak terkena CORS, jadi kamera
+    // Depok diputar dengan HLS native. Browser tanpa HLS native (mis. Firefox) diarahkan ke portal
+    // resmi, yang berada satu origin dengan stream sehingga bebas dari batasan tersebut.
+    function clearDepokCheckTimer() {
+      if (depokCheckTimer) {
+        clearTimeout(depokCheckTimer);
+        depokCheckTimer = null;
+      }
+    }
 
-    function startFlvPlayer(url) {
-      if (!window.flvjs || !flvjs.isSupported()) {
-        setPlayerMessage('Browser ini tidak mendukung FLV. Coba Chrome atau Edge terbaru.', 'error');
+    function handleDepokPlaying() {
+      clearDepokCheckTimer();
+      setPlayerMessage('Stream Depok diputar langsung dari server Dishub Depok. Status ini menunjukkan player menerima data, bukan jaminan stream akan selalu tersedia.');
+    }
+
+    function handleDepokError() {
+      // Kode 4 (MEDIA_ERR_SRC_NOT_SUPPORTED) berarti playlist statis/single-segmen yang tidak akan
+      // sembuh dengan percobaan ulang; error lain masih layak dicoba lagi.
+      retryDepokStream(Boolean(els.player.error) && els.player.error.code === 4);
+    }
+
+    function endDepokPlayer(message) {
+      depokCurrentUrl = null;
+      depokAttempt = 0;
+      setPlayerMessage(message, 'error');
+      stopPlayer();
+    }
+
+    function retryDepokStream(fatal) {
+      if (!depokCurrentUrl) return;
+      if (fatal || depokAttempt >= DEPOK_MAX_ATTEMPTS) {
+        endDepokPlayer(fatal
+          ? 'Stream Depok gagal diputar. Playlist kamera ini kemungkinan tidak lagi berisi segmen live (kamera sudah tidak mengudara) atau browser tidak mendukung formatnya. Coba kamera Depok lain.'
+          : `Stream Depok tidak mengirim gambar setelah ${DEPOK_MAX_ATTEMPTS} percobaan. Kamera ini kemungkinan sedang offline.`);
         return;
       }
-      setPlayerMessage('Menghubungkan ke stream FLV Surakarta melalui proxy...');
-      flvInstance = flvjs.createPlayer({ type: 'flv', url, isLive: true, hasAudio: false, hasVideo: true }, {
-        enableWorker: false, enableStashBuffer: false, stashInitialSize: 128,
-        lazyLoad: false, autoCleanupSourceBuffer: true
+      els.player.removeAttribute('src');
+      els.player.load();
+      connectDepokStream();
+    }
+
+    function connectDepokStream() {
+      depokAttempt += 1;
+      const attempt = depokAttempt;
+      setPlayerMessage(depokAttempt > 1
+        ? `Menghubungkan ulang ke stream CCTV Depok (percobaan ${depokAttempt} dari ${DEPOK_MAX_ATTEMPTS})...`
+        : 'Menghubungkan ke stream HLS CCTV Depok...');
+      els.player.src = depokCurrentUrl;
+      // Saat percobaan ulang, src lama dilepas sehingga play() percobaan sebelumnya ikut ditolak;
+      // pesan itu hanya berlaku kalau percobaan ini masih yang berjalan.
+      els.player.play().catch(() => {
+        if (depokCurrentUrl && attempt === depokAttempt) setPlayerMessage('Stream Depok siap. Tekan tombol Play untuk memulai.');
       });
+      // Sebagian kamera Depok menerima koneksi tanpa pernah mengirim data dan tanpa memicu error,
+      // jadi tiap percobaan dibatasi waktunya lalu diulang.
+      clearDepokCheckTimer();
+      depokCheckTimer = setTimeout(() => {
+        depokCheckTimer = null;
+        if (els.player.videoWidth) return;
+        retryDepokStream();
+      }, DEPOK_ATTEMPT_TIMEOUT);
+    }
+
+    function startEmbedPlayer(url, message) {
+      els.player.classList.add('hidden');
+      els.embedFrame.classList.remove('hidden');
+      els.embedFrame.src = url;
+      setPlayerMessage(message);
+    }
+
+    function startDepokPlayer(url) {
+      if (!els.player.canPlayType('application/vnd.apple.mpegurl') && !els.player.canPlayType('application/x-mpegURL')) {
+        startEmbedPlayer(DEPOK_PORTAL_URL, 'Browser ini belum memutar HLS langsung, jadi portal resmi Dishub Depok ditampilkan di sini; pilih kamera pada daftar portal tersebut.');
+        return;
+      }
+      depokAttempt = 0;
+      depokCurrentUrl = url;
+      els.player.addEventListener('error', handleDepokError);
+      els.player.addEventListener('playing', handleDepokPlaying);
+      connectDepokStream();
+    }
+
+    function clearFlvConnectTimer() {
+      if (flvConnectTimer) {
+        clearTimeout(flvConnectTimer);
+        flvConnectTimer = null;
+      }
+    }
+
+    function stopFlvPlayer() {
+      clearFlvConnectTimer();
+      els.player.removeEventListener('playing', handleFlvPlaying);
+      if (!flvInstance) return;
+      try {
+        flvInstance.pause();
+        flvInstance.unload();
+        flvInstance.detachMediaElement();
+        flvInstance.destroy();
+      } catch (error) {
+        console.debug('Player FLV sudah tidak aktif.', error);
+      }
+      flvInstance = null;
+    }
+
+    function handleFlvPlaying() {
+      clearFlvConnectTimer();
+      setPlayerMessage('Stream FLV berhasil diputar. Status ini menunjukkan player menerima data, bukan jaminan stream akan selalu tersedia.');
+    }
+
+    function endFlvPlayer(message) {
+      flvCurrentUrl = null;
+      flvAttempt = 0;
+      flvMediaError = null;
+      setPlayerMessage(message, 'error');
+      stopPlayer();
+    }
+
+    function retryFlvStream() {
+      if (!flvCurrentUrl) return;
+      stopFlvPlayer();
+      if (flvAttempt >= FLV_MAX_ATTEMPTS) {
+        endFlvPlayer(flvMediaError
+          ? 'Stream Solo mengirim data tetapi tidak bisa didekode, jadi kamera ini kemungkinan bermasalah. Coba kamera lain.'
+          : `Stream Solo tidak bisa diputar setelah ${FLV_MAX_ATTEMPTS} percobaan. Kamera ini kemungkinan sedang offline.`);
+        return;
+      }
+      flvConnectTimer = setTimeout(connectFlvStream, FLV_RETRY_DELAY);
+    }
+
+    function connectFlvStream() {
+      flvAttempt += 1;
+      setPlayerMessage(flvAttempt > 1
+        ? `Menghubungkan ulang ke stream FLV CCTV Solo (percobaan ${flvAttempt} dari ${FLV_MAX_ATTEMPTS})...`
+        : 'Menghubungkan ke stream FLV CCTV Solo...');
+      flvInstance = window.flvjs.createPlayer(
+        { type: 'flv', url: flvCurrentUrl, isLive: true },
+        { enableWorker: true, lazyLoadMaxDuration: 3, seekType: 'range' }
+      );
       flvInstance.attachMediaElement(els.player);
-      flvInstance.on(flvjs.Events.ERROR, (type, detail, info) => {
-        console.error('FLV playback error:', type, detail, info);
-        setPlayerMessage('Stream FLV gagal diputar. Periksa status proxy atau ketersediaan kamera.', 'error');
+      flvInstance.on(window.flvjs.Events.ERROR, (errorType, detail) => {
+        // flv.js melempar MediaError (mis. CodecUnsupported) untuk gangguan kecil pada
+        // stream yang tetap bisa diputar; hanya error jaringan yang perlu dicoba ulang.
+        if (errorType === 'MediaError') {
+          flvMediaError = String(detail || 'MediaError');
+          console.debug('flv.js MediaError diabaikan:', detail);
+          return;
+        }
+        retryFlvStream();
       });
-      flvInstance.on(flvjs.Events.LOADING_COMPLETE, () => {
-        setPlayerMessage('Stream FLV selesai dikirim oleh sumber.');
-      });
+      els.player.addEventListener('playing', handleFlvPlaying);
+      // Endpoint Solo sering menerima koneksi tanpa pernah mengirim data dan tanpa
+      // memicu error, jadi tiap percobaan dibatasi waktunya lalu diulang.
+      flvConnectTimer = setTimeout(retryFlvStream, FLV_ATTEMPT_TIMEOUT);
       flvInstance.load();
-      els.player.play().then(() => setPlayerMessage('Stream Surakarta berjalan melalui FLV player.')).catch(() => setPlayerMessage('Stream siap. Tekan tombol Play untuk memulai.'));
+      // Jangan menimpa pesan gagal: saat teardown, play() ikut ditolak dan
+      // flvInstance sudah null.
+      els.player.play().catch(() => {
+        if (flvInstance) setPlayerMessage('Stream siap. Tekan tombol Play untuk memulai.');
+      });
+    }
+
+    function startFlvPlayer(url) {
+      if (!window.flvjs || !window.flvjs.isSupported()) {
+        setPlayerMessage('Browser ini tidak mendukung pemutaran FLV (flv.js gagal dimuat). Coba Chrome, Edge, atau Safari terbaru.', 'error');
+        return;
+      }
+      flvCurrentUrl = url;
+      flvAttempt = 0;
+      flvMediaError = null;
+      connectFlvStream();
     }
 
     function navigateCamera(direction) {
@@ -958,8 +1241,7 @@
     }
 
     function requestFullscreen() {
-      const camera = cameras.find(c => cameraKey(c) === selectedCameraKey);
-      const target = camera && camera.source === 'dki' ? els.dkiFrame : els.player;
+      const target = els.embedFrame.classList.contains('hidden') ? els.player : els.embedFrame;
       if (target.requestFullscreen) target.requestFullscreen().catch(() => showToast('Fullscreen tidak tersedia di browser ini.'));
       else if (target.webkitEnterFullscreen) target.webkitEnterFullscreen();
       else showToast('Fullscreen tidak didukung browser ini.');
@@ -997,6 +1279,8 @@
     setView('map');
     loadWeather('Kota Bekasi', -6.2383, 106.9756, 'weather-bekasi');
     loadWeather('DKI Jakarta', -6.2088, 106.8456, 'weather-jakarta');
+    loadWeather('Kota Depok', -6.4, 106.81861, 'weather-depok');
+    loadWeather('Kota Surakarta', -7.5755, 110.8245, 'weather-solo');
     loadCameras();
   </script>
 </body>
